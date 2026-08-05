@@ -3,13 +3,20 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-        steps {
-        checkout scm
+        stage('Check Workspace') {
+            steps {
+                sh '''
+                    echo "===== WORKSPACE ====="
+                    pwd
 
-        sh '''
-            echo "===== WORKSPACE ====="
-            pwd
+                    echo "===== FILES ====="
+                    ls -la
+
+                    echo "===== ALL FILES ====="
+                    find . -maxdepth 2 -type f | sort
+                '''
+            }
+        }
 
             echo "===== FILES ====="
             ls -la
