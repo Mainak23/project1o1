@@ -9,13 +9,12 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Build Training Image') {
             steps {
                 sh '''
-                    python3 -m venv .venv
-                    . .venv/bin/activate
-                    python -m pip install --upgrade pip
-                    python -m pip install -r requirements.txt
+                    podman build \
+                        -t ml-training:${BUILD_NUMBER} \
+                        .
                 '''
             }
         }
@@ -23,8 +22,8 @@ pipeline {
         stage('Train') {
             steps {
                 sh '''
-                    . .venv/bin/activate
-                    python new.py
+                    podman run --rm \
+                        ml-training:${BUILD_NUMBER}
                 '''
             }
         }
