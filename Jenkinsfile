@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -10,13 +11,21 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'pip install -r requirements.txt'
+                sh '''
+                    python3 -m venv .venv
+                    . .venv/bin/activate
+                    python -m pip install --upgrade pip
+                    python -m pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Train') {
             steps {
-                sh 'python new.py'
+                sh '''
+                    . .venv/bin/activate
+                    python new.py
+                '''
             }
         }
     }
