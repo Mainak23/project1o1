@@ -20,9 +20,10 @@ pipeline {
         stage('Build Training Image') {
             steps {
                 sh '''
-                    podman build \
-                        -t ml-training:${BUILD_NUMBER} \
-                        .
+                podman build \
+                --cgroup-manager=cgroupfs \
+                -t ml-training:${BUILD_NUMBER} \
+                .
                 '''
             }
         }
