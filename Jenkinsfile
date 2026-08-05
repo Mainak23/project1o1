@@ -4,17 +4,21 @@ pipeline {
     stages {
 
         stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
+        steps {
+        checkout scm
 
+        sh '''
+            echo "===== WORKSPACE ====="
+            pwd
 
-        stage('Check Workspace') {
-            steps {
-                sh 'pwd && ls -la'
-            }
+            echo "===== FILES ====="
+            ls -la
+
+            echo "===== ALL FILES ====="
+            find . -maxdepth 2 -type f | sort
+        '''
         }
+    }
         stage('Build Training Image') {
             steps {
                 sh '''
