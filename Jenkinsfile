@@ -2,30 +2,21 @@ pipeline {
     agent any
 
     stages {
-
-        stage('Check Workspace') {
+        stage('Checkout') {
             steps {
+                checkout scm
+
                 sh '''
                     echo "===== WORKSPACE ====="
                     pwd
-
                     echo "===== FILES ====="
                     ls -la
-
                     echo "===== ALL FILES ====="
                     find . -maxdepth 2 -type f | sort
                 '''
             }
         }
 
-            echo "===== FILES ====="
-            ls -la
-
-            echo "===== ALL FILES ====="
-            find . -maxdepth 2 -type f | sort
-        '''
-        }
-    }
         stage('Build Training Image') {
             steps {
                 sh '''
