@@ -18,6 +18,14 @@ pipeline {
             }
         }
 
+            echo "===== FILES ====="
+            ls -la
+
+            echo "===== ALL FILES ====="
+            find . -maxdepth 2 -type f | sort
+        '''
+        }
+    }
         stage('Build Training Image') {
             steps {
                 sh '''
