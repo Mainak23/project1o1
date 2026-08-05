@@ -9,6 +9,12 @@ pipeline {
             }
         }
 
+
+        stage('Check Workspace') {
+            steps {
+                sh 'pwd && ls -la'
+            }
+        }
         stage('Build Training Image') {
             steps {
                 sh '''
