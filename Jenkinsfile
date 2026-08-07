@@ -41,6 +41,7 @@ pipeline {
                 ]) {
                     sh '''
                         podman run --rm \
+                            --cgroup-manager=cgroupfs \
                             --network ml-network \
                             -e MLFLOW_TRACKING_URI="$MLFLOW_TRACKING_URI" \
                             ml-training:${BUILD_NUMBER}
