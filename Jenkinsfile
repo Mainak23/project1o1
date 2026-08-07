@@ -4,25 +4,27 @@ pipeline {
     stages {
 
         stage('Checkout') {
-        steps {
-        checkout scm
+            steps {
+                checkout scm
 
-        sh '''
-            echo "===== WORKSPACE ====="
-            pwd
+                sh '''
+                    echo "===== WORKSPACE ====="
+                    pwd
 
-            echo "===== FILES ====="
-            ls -la
+                    echo "===== FILES ====="
+                    ls -la
 
-            echo "===== ALL FILES ====="
-            find . -maxdepth 2 -type f | sort
-        '''
+                    echo "===== ALL FILES ====="
+                    find . -maxdepth 2 -type f | sort
+                '''
+            }
         }
-    }
+
         stage('Build Training Image') {
             steps {
                 sh '''
                     podman build \
+                        --cgroup-manager=cgroupfs \
                         -t ml-training:${BUILD_NUMBER} \
                         .
                 '''
@@ -31,10 +33,19 @@ pipeline {
 
         stage('Train') {
             steps {
-                sh '''
-                    podman run --rm \
-                        ml-training:${BUILD_NUMBER}
-                '''
+                withCredentials([
+                    string(
+                        credentialsId: 'mlflow-tracking-uri',
+                        variable: 'MLFLOW_TRACKING_URI'
+                    )
+                ]) {
+                    sh '''
+                        podman run --rm \
+                            --network ml-network \
+                            -e MLFLOW_TRACKING_URI="$MLFLOW_TRACKING_URI" \
+                            ml-training:${BUILD_NUMBER}
+                    '''
+                }
             }
         }
     }
