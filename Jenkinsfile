@@ -30,7 +30,7 @@ pipeline {
             steps {
                 sh '''
                     podman build \
-                        -t ml-training:${BUILD_NUMBER} \
+                        -t ml-training:${BUILD_} \
                         .
                 '''
             }
