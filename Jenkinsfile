@@ -8,7 +8,7 @@ pipeline {
         checkout scm
 
         sh '''
-            echo "===== WORKSPACE ====="
+            echo "===== WORKSPACE ="
             pwd
 
             echo "===== FILES ====="
