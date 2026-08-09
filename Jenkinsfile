@@ -10,33 +10,12 @@ pipeline {
                 sh '''
                     echo "===== WORKSPACE ====="
                     pwd
-
-                    echo "===== FILES ====="
                     ls -la
-
-                    echo "===== ALL FILES ====="
                     find . -maxdepth 2 -type f | sort
                 '''
             }
         }
-        stage('Podman Diagnostics') {
-        steps {
-            sh '''
-                echo "===== USER ====="
-                whoami
-                id
 
-                echo "===== PODMAN ====="
-                podman info
-
-                echo "===== NETWORKS ====="
-                podman network ls
-
-                echo "===== ML NETWORK ====="
-                podman network inspect ml-network || true
-            '''
-        }
-}
         stage('Create Network') {
             steps {
                 sh '''
@@ -45,7 +24,7 @@ pipeline {
             }
         }
 
-        stage('Build MLflow Server Image') {
+        stage('Build MLflow Image') {
             steps {
                 sh '''
                     podman build \
@@ -57,7 +36,7 @@ pipeline {
             }
         }
 
-        stage('Run MLflow Server') {
+        stage('Run MLflow') {
             steps {
                 sh '''
                     podman rm -f mlflow 2>/dev/null || true
@@ -72,29 +51,17 @@ pipeline {
             }
         }
 
-        stage('Wait for MLflow Server') {
+        stage('Wait for MLflow') {
             steps {
                 sh '''
                     echo "Waiting for MLflow..."
 
-                    until curl -s http://127.0.0.1:5000/health | grep -q '"status":"healthy"'; do
-                        echo "MLflow is not ready..."
+                    until curl -sf http://127.0.0.1:5000/health > /dev/null; do
+                        echo "MLflow not ready..."
                         sleep 5
                     done
 
                     echo "MLflow is ready."
-                '''
-            }
-        }
-
-        stage('Build ML Training Image') {
-            steps {
-                sh '''
-                    podman build \
-                        --cgroup-manager=cgroupfs \
-                        -t ml-training:${BUILD_NUMBER} \
-                        -f Dockerfile.ml-training \
-                        .
                 '''
             }
         }
@@ -106,6 +73,17 @@ pipeline {
                         --network ml-network \
                         docker.io/curlimages/curl \
                         -v http://mlflow:5000
+                '''
+            }
+        }
+
+        stage('Build ML Training Image') {
+            steps {
+                sh '''
+                    podman build \
+                        --cgroup-manager=cgroupfs \
+                        -t ml-training:${BUILD_NUMBER} \
+                        .
                 '''
             }
         }
@@ -125,6 +103,7 @@ pipeline {
     post {
         always {
             sh '''
+                echo "Cleaning MLflow container..."
                 podman rm -f mlflow 2>/dev/null || true
             '''
         }
