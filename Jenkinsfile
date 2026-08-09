@@ -43,7 +43,7 @@ pipeline {
 
                     podman run -d \
                     --name mlflow \
-                    --network ml-network \
+                    --network slirp4netns \
                     -p 5000:5000 \
                     mlflow-server:latest
                     '''
@@ -56,7 +56,7 @@ pipeline {
                 sh '''
                     echo "Waiting for MLflow..."
 
-                    until curl -sf curl -sf 127.0.0.1:5000/health > /dev/null; do
+                    until curl -sf 127.0.0.1:5000/health > /dev/null; do
                         echo "MLflow not ready..."
                         sleep 5
                     done
