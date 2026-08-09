@@ -23,6 +23,9 @@ pipeline {
         stage('Build Training Image') {
             steps {
                 sh '''
+                    sudo rm -rf /tmp/storage-run-111/containers
+                    sudo rm -rf /tmp/storage-run-111/libpod/tmp
+                    
                     podman build \
                         --cgroup-manager=cgroupfs \
                         -t ml-training:${BUILD_NUMBER} \
