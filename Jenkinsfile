@@ -101,12 +101,12 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            sh '''
-                echo "Cleaning MLflow container..."
-                podman rm -f mlflow 2>/dev/null || true
-            '''
-        }
-    }
+    // post {
+    //     always {
+    //         sh '''
+    //             echo "Cleaning MLflow container..."
+    //             podman rm -f mlflow 2>/dev/null || true
+    //         '''
+    //     }
+    // }
 }
