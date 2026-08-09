@@ -95,6 +95,7 @@ pipeline {
                         --network ml-network \
                         -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
                         ml-training:${BUILD_NUMBER}
+                        python -c "import os; print(os.environ.get('MLFLOW_TRACKING_URI'))"
                 '''
             }
         }
