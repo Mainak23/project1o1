@@ -19,8 +19,24 @@ pipeline {
                 '''
             }
         }
+        stage('Podman Diagnostics') {
+        steps {
+            sh '''
+                echo "===== USER ====="
+                whoami
+                id
 
+                echo "===== PODMAN ====="
+                podman info
 
+                echo "===== NETWORKS ====="
+                podman network ls
+
+                echo "===== ML NETWORK ====="
+                podman network inspect ml-network || true
+            '''
+        }
+}
         stage('Create Network') {
             steps {
                 sh '''
@@ -44,12 +60,13 @@ pipeline {
         stage('Run MLflow Server') {
             steps {
                 sh '''
-                    podman run --rm \
+                    podman rm -f mlflow 2>/dev/null || true
+
+                    podman run -d \
                         --name mlflow \
                         --network ml-network \
                         -p 5000:5000 \
-                        -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
-                        -v $(pwd)/mlruns:/mlruns \
+                        -v "$(pwd)/mlruns:/mlruns" \
                         mlflow-server:latest
                 '''
             }
@@ -58,39 +75,18 @@ pipeline {
         stage('Wait for MLflow Server') {
             steps {
                 sh '''
-                    echo "Waiting for MLflow server to be ready..."
-                    until curl -s http://localhost:5000/health | grep -q '"status":"healthy"'; do
-                        echo "MLflow server is not ready yet. Waiting..."
+                    echo "Waiting for MLflow..."
+
+                    until curl -s http://127.0.0.1:5000/health | grep -q '"status":"healthy"'; do
+                        echo "MLflow is not ready..."
                         sleep 5
                     done
-                    echo "MLflow server is ready."
+
+                    echo "MLflow is ready."
                 '''
             }
         }
-        stage('Run MLflow UI') {
-            steps {
-                sh '''
-                    podman run --rm \
-                        --name mlflow-ui \
-                        --network ml-network \
-                        -p 5001:5000 \
-                        -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
-                        mlflow-server:latest
-                '''
-            }
-        }
-        stage('Wait for MLflow UI') {
-            steps {
-                sh '''
-                    echo "Waiting for MLflow UI to be ready..."
-                    until curl -s http://localhost:5001/ | grep -q 'MLflow Tracking'; do
-                        echo "MLflow UI is not ready yet. Waiting..."
-                        sleep 5
-                    done
-                    echo "MLflow UI is ready."
-                '''
-            }
-        }
+
         stage('Build ML Training Image') {
             steps {
                 sh '''
@@ -103,22 +99,34 @@ pipeline {
             }
         }
 
+        stage('Test MLflow Network') {
+            steps {
+                sh '''
+                    podman run --rm \
+                        --network ml-network \
+                        docker.io/curlimages/curl \
+                        -v http://mlflow:5000
+                '''
+            }
+        }
+
         stage('Train') {
             steps {
-                withCredentials([
-                    string(
-                        credentialsId: 'mlflow-tracking-uri',
-                        variable: 'MLFLOW_TRACKING_URI'
-                    )
-                ]) {
-                    sh '''
-                        podman run --rm \
+                sh '''
+                    podman run --rm \
                         --network ml-network \
                         -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
                         ml-training:${BUILD_NUMBER}
-                    '''
-                }
+                '''
             }
+        }
+    }
+
+    post {
+        always {
+            sh '''
+                podman rm -f mlflow 2>/dev/null || true
+            '''
         }
     }
 }
