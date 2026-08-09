@@ -44,7 +44,6 @@ pipeline {
                         --name mlflow \
                         --network ml-network \
                         -p 5000:5000 \
-                        -v "$(pwd)/mlruns:/mlruns" \
                         mlflow-server:latest
                 '''
             }
