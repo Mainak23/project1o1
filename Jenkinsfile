@@ -43,7 +43,7 @@ pipeline {
 
                     podman run -d \
                     --name mlflow \
-                    --network slirp4netns \
+                    --network ml-network \
                     -p 5000:5000 \
                     mlflow-server:latest
                     '''

@@ -73,9 +73,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 # ============================================================
 
 C = 3.0
-MAX_ITER = 10
+MAX_ITER = 3
 SOLVER = "liblinear"
-PENALTY = "l1"
+PENALTY = "l2"
 
 
 # ============================================================
