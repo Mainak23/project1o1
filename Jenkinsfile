@@ -44,11 +44,11 @@ pipeline {
                         --name mlflow \
                         --network ml-network \
                         -p 5000:5000 \
-                        --host 0.0.0.0\  
-                        --port 5000\
-                        --allowed-hosts "mlflow:5000,localhost:5000,127.0.0.1:5000\
-                        mlflow-server:latest
-                '''
+                        mlflow-server:latest \
+                        --host 0.0.0.0 \
+                        --port 5000 \
+                        --allowed-hosts "mlflow:5000,localhost:5000,127.0.0.1:5000"
+                    '''
             }
         }
 
