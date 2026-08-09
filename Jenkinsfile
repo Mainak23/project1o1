@@ -44,17 +44,21 @@ pipeline {
                         --name mlflow \
                         --network ml-network \
                         -p 5000:5000 \
+                        --host 0.0.0.0\  
+                        --port 5000\
+                        --allowed-hosts "mlflow:5000,localhost:5000,127.0.0.1:5000\
                         mlflow-server:latest
                 '''
             }
         }
+
 
         stage('Wait for MLflow') {
             steps {
                 sh '''
                     echo "Waiting for MLflow..."
 
-                    until curl -sf curl -sf http://mlflow:5000/health > /dev/null; do
+                    until curl -sf curl -sf 127.0.0.1:5000/health > /dev/null; do
                         echo "MLflow not ready..."
                         sleep 5
                     done
