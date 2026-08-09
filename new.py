@@ -72,8 +72,8 @@ X_train, X_test, y_train, y_test = train_test_split(
 # 4. MODEL CONFIGURATION
 # ============================================================
 
-C = 3.0
-MAX_ITER = 3
+C = 0
+MAX_ITER = 1
 SOLVER = "liblinear"
 PENALTY = "l2"
 
