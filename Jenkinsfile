@@ -41,9 +41,9 @@ pipeline {
                 ]) {
                     sh '''
                         podman run --rm \
-                             --network ml-network \
-                            -e MLFLOW_TRACKING_URI="$MLFLOW_TRACKING_URI" \
-                            ml-training:${BUILD_NUMBER}
+                        --network ml-network \
+                        -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
+                        ml-training:${BUILD_NUMBER}
                     '''
                 }
             }
