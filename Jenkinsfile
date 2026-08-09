@@ -54,7 +54,7 @@ pipeline {
                 sh '''
                     echo "Waiting for MLflow..."
 
-                    until curl -sf http://127.0.0.1:5000/health > /dev/null; do
+                    until curl -sf curl -sf http://mlflow:5000/health > /dev/null; do
                         echo "MLflow not ready..."
                         sleep 5
                     done
