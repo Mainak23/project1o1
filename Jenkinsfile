@@ -30,6 +30,7 @@ pipeline {
                     podman build \
                         --cgroup-manager=cgroupfs \
                         -t mlflow-server:latest \
+                        -f Dockerfile.mlflow\
                         .
                 '''
             }
@@ -41,13 +42,10 @@ pipeline {
                     podman rm -f mlflow 2>/dev/null || true
 
                     podman run -d \
-                        --name mlflow \
-                        --network ml-network \
-                        -p 5000:5000 \
-                        mlflow-server:latest \
-                        --host 0.0.0.0 \
-                        --port 5000 \
-                        --allowed-hosts "mlflow:5000,localhost:5000,127.0.0.1:5000"
+                    --name mlflow \
+                    --network ml-network \
+                    -p 5000:5000 \
+                    mlflow-server:latest
                     '''
             }
         }
