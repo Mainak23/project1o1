@@ -30,7 +30,6 @@ pipeline {
                     podman build \
                         --cgroup-manager=cgroupfs \
                         -t mlflow-server:latest \
-                        -f Dockerfile.mlflow-server \
                         .
                 '''
             }
