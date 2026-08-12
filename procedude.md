@@ -360,3 +360,77 @@ Jenkins
               when Git isn't available
 
 So you don't "get" GIT_PYTHON_REFRESH from Jenkins or GitHub. You define it because you're telling the training environment how to behave.And in your case, quiet is reasonable because Jenkins is already supplying the authoritative commit SHA.
+
+                    JENKINS
+                       │
+              checkout Git commit
+                       │
+                       │ GIT_COMMIT
+                       ▼
+              ┌─────────────────┐
+              │ Training        │
+              │ Container       │
+              │                 │
+              │ Python          │
+              │   │             │
+              │   ├── MLflow ───────────┐
+              │   │  tracking URI       │
+              │   │                     │
+              │   └── GitPython         │
+              │       │                 │
+              │       └── warning       │
+              │          suppression    │
+              └─────────────────┘       │
+                                        │
+                                        ▼
+                              ┌─────────────────┐
+                              │ MLflow Container│
+                              │                 │
+                              │ mlflow:5000     │
+                              │      │          │
+                              │   mlflow.db     │
+                              │   artifacts     │
+                              └─────────────────┘
+
+Bottom line: MLFLOW_TRACKING_URI is communication with MLflow; GIT_COMMIT is build provenance; GIT_PYTHON_REFRESH is merely a local GitPython warning-control setting.
+
+MinIO
+✅ MinIO container
+✅ MinIO persistent volume
+✅ MinIO bucket
+✅ MLflow configured to use MinIO
+
+podman pull quay.io/minio/minio:latest
+podman volume create minio-data
+podman volume inspect minio-data
+
+podman run -d \
+    --name minio \
+    --network ml-network \
+    -p 9000:9000 \
+    -p 9001:9001 \
+    -v minio-data:/data \
+    -e MINIO_ROOT_USER=minioadmin \
+    -e MINIO_ROOT_PASSWORD=minioadmin123 \
+    quay.io/minio/minio:latest \
+    server /data \
+    --console-address ":9001"
+
+if we need to migrate it 
+
+podman rm -f mlflow
+podman run -d \
+    --name mlflow \
+    --network ml-network \
+    -p 5000:5000 \
+    -v mlflow-data:/mlflow-data \
+    -e AWS_ACCESS_KEY_ID=minioadmin \
+    -e AWS_SECRET_ACCESS_KEY=minioadmin123 \
+    -e MLFLOW_S3_ENDPOINT_URL=http://minio:9000 \
+    ghcr.io/mlflow/mlflow:latest \
+    mlflow server \
+    --host 0.0.0.0 \
+    --port 5000 \
+    --backend-store-uri sqlite:////mlflow-data/mlflow.db \
+    --default-artifact-root s3://mlflow-artifacts \
+    --allowed-hosts "mlflow:5000,localhost:5000,127.0.0.1:5000"
