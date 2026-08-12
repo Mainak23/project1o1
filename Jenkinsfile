@@ -15,6 +15,7 @@ pipeline {
                 '''
             }
         }
+    }
 
     stage('Build ML Training Image') {
     steps {
