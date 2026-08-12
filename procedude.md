@@ -345,4 +345,18 @@ model
                     ▼
                  MLflow
 
+GIT_PYTHON_REFRESH tells GitPython what to do when Git cannot be initialized.
 
+Jenkins
+│
+├── GIT_COMMIT
+│      └── actual code version
+│
+├── MLFLOW_TRACKING_URI
+│      └── where MLflow lives
+│
+└── GIT_PYTHON_REFRESH
+       └── how GitPython behaves
+              when Git isn't available
+
+So you don't "get" GIT_PYTHON_REFRESH from Jenkins or GitHub. You define it because you're telling the training environment how to behave.And in your case, quiet is reasonable because Jenkins is already supplying the authoritative commit SHA.

@@ -5,7 +5,7 @@
 
 from mlflow.models.signature import infer_signature
 import os
-os.environ["GIT_PYTHON_REFRESH"] = "quiet"
+
 import mlflow
 import mlflow.sklearn
 

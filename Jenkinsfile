@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        MLFLOW_TRACKING_URI = 'http://mlflow:5000'
+        GIT_PYTHON_REFRESH = 'quiet'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -36,8 +41,9 @@ pipeline {
                 sh '''
                     podman run --rm \
                         --network ml-network \
-                        -e MLFLOW_TRACKING_URI=http://mlflow:5000\
-                        -e GIT_COMMIT="${GIT_COMMIT}"  \
+                        -e MLFLOW_TRACKING_URI="${MLFLOW_TRACKING_URI}" \
+                        -e GIT_COMMIT="${GIT_COMMIT}" \
+                        -e GIT_PYTHON_REFRESH="${GIT_PYTHON_REFRESH}" \
                         ml-training:${BUILD_NUMBER}
                 '''
             }
