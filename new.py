@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 mlflow.set_tracking_uri(
     os.environ["MLFLOW_TRACKING_URI"]
 )
-
+git_commit = os.getenv("GIT_COMMIT", "unknown")
 
 
 # ============================================================
@@ -49,6 +49,16 @@ mlflow.set_experiment(
     EXPERIMENT_NAME
 )
 
+experiment = mlflow.get_experiment_by_name(EXPERIMENT_NAME)
+
+if experiment is None:
+    experiment_id = mlflow.create_experiment(EXPERIMENT_NAME)
+else:
+    experiment_id = experiment.experiment_id
+
+
+
+mlflow.set_experiment(EXPERIMENT_NAME)
 
 # ============================================================
 # 3. DATA
@@ -75,7 +85,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 C = 9
 MAX_ITER = 1
 SOLVER = "liblinear"
-PENALTY = "l2"
+PENALTY = "l1"
 
 
 # ============================================================
@@ -101,6 +111,7 @@ model = Pipeline([
 with mlflow.start_run(
     run_name="Logistic Regression Baseline-80"
 ) as run:
+    mlflow.set_tag("git_commit", git_commit)
 
     # --------------------------------------------------------
     # ATTRIBUTES

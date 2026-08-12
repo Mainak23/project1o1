@@ -292,3 +292,57 @@ MLflow container
    │
    ▼
 mlflow-data volume
+
+check:
+podman exec mlflow \
+    python -c "
+import sqlite3
+conn = sqlite3.connect('/mlflow-data/mlflow.db')
+
+print('Experiments:')
+for row in conn.execute('SELECT experiment_id, name FROM experiments'):
+    print(row)
+
+print('\nRuns:')
+for row in conn.execute('SELECT run_uuid, experiment_id, status FROM runs ORDER BY start_time DESC'):
+    print(row)
+"
+
+Check the metrics
+podman exec mlflow \
+    python -c "
+import sqlite3
+conn = sqlite3.connect('/mlflow-data/mlflow.db')
+
+for row in conn.execute('''
+    SELECT run_uuid, key, value
+    FROM metrics
+    ORDER BY run_uuid
+'''):
+    print(row)
+"
+
+goal :I want every MLflow run to tell me exactly which Git commit produced this model.
+
+git comit with mlflow:
+Git commit
+   ↓
+a8f32c1
+   ↓
+MLflow run
+   ↓
+model
+
+                 Jenkins
+                    │
+             Git checkout
+                    │
+              GIT_COMMIT
+                    │
+                    ▼
+          Training container
+                    │
+                    ▼
+                 MLflow
+
+
