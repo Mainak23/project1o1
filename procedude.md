@@ -400,6 +400,21 @@ MinIO
 ✅ MinIO bucket
 ✅ MLflow configured to use MinIO
 
+artifact location 
+podman exec mlflow python -c "
+import mlflow
+
+client = mlflow.MlflowClient()
+
+for e in client.search_experiments():
+    print(
+        'EXPERIMENT:',
+        e.name,
+        '| ARTIFACT LOCATION:',
+        e.artifact_location
+    )
+"
+
 podman pull quay.io/minio/minio:latest
 podman volume create minio-data
 podman volume inspect minio-data

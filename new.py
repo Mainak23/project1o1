@@ -43,7 +43,7 @@ git_commit = os.getenv("GIT_COMMIT", "unknown")
 # 2. EXPERIMENT
 # ============================================================
 
-EXPERIMENT_NAME = "toy-experiment2"
+EXPERIMENT_NAME = "minio-test"
 
 mlflow.set_experiment(
     EXPERIMENT_NAME
