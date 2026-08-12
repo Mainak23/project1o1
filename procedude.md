@@ -474,3 +474,73 @@ MLflow
 
 MinIO
   ✅ accesses minio-data
+
+one note we need boto3
+
+Rule to remember:
+
+Put a dependency in the image of the component that actually executes/imports it.
+
+Here the error is:
+
+MLflow → import boto3 → ❌
+
+Therefore:
+
+MLflow image → boto3 ✅
+
+not:
+
+Training image → boto3 ❌ unnecessary
+Your MLflow server understands:
+
+s3://mlflow-artifacts
+
+and tries to use the S3 API, but the MLflow container doesn't have the Python library boto3 installed.
+
+That's why you get:
+
+ModuleNotFoundError: No module named 'boto3'
+Why do you need boto3?
+
+Think of it like this:
+
+MLflow
+   │
+   │ "I need to store this artifact"
+   ▼
+boto3
+   │
+   │ speaks S3 protocol
+   ▼
+MinIO
+   │
+   ▼
+mlflow-artifacts bucket
+
+boto3 is the Python client that MLflow uses to communicate with S3-compatible storage.
+
+And importantly:
+
+boto3 does NOT mean you need AWS.
+
+MinIO implements the S3 API, so boto3 can talk to MinIO.
+
+boto3
+  │
+  ├── AWS S3
+  │
+  └── MinIO ✅
+
+and MLflow UI should show:
+
+Run
+└── Artifacts
+    └── model
+
+So zero Python changes. The problem is entirely on the MLflow server → MinIO side.
+
+podman exec -it mlflow bash
+python -c "import boto3; print(boto3.__version__)"
+podman restart mlflow
+podman exec mlflow python -c "import boto3; print(boto3.__version__)"
