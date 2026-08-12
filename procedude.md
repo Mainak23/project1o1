@@ -434,3 +434,28 @@ podman run -d \
     --backend-store-uri sqlite:////mlflow-data/mlflow.db \
     --default-artifact-root s3://mlflow-artifacts \
     --allowed-hosts "mlflow:5000,localhost:5000,127.0.0.1:5000"
+
+                 ml-network
+                     │
+        ┌────────────┴────────────┐
+        │                         │
+      MLflow                    MinIO
+        │                         │
+        │ HTTP/S3 API             │
+        │                         │
+        └──────► :9000 ◄──────────┘
+                                  │
+                                  ▼
+                            minio-data
+                                  │
+                                  ▼
+                            actual storage
+
+MLflow
+  ❌ does NOT directly access minio-data
+
+MLflow
+  ✅ accesses http://minio:9000
+
+MinIO
+  ✅ accesses minio-data
