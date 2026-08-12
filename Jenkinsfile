@@ -15,35 +15,26 @@ pipeline {
                 '''
             }
         }
-    }
 
-    stage('Build ML Training Image') {
-    steps {
-        sh '''
-            podman build \
-                -t ml-training:${BUILD_NUMBER} \
-                .
-        '''
-    }
-    }
+        stage('Build ML Training Image') {
+            steps {
+                sh '''
+                    podman build \
+                        -t ml-training:${BUILD_NUMBER} \
+                        .
+                '''
+            }
+        }
 
-    stage('Train') {
-        steps {
-            sh '''
-                podman run --rm \
-                    --network ml-network \
-                    -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
-                    ml-training:${BUILD_NUMBER}
-            '''
+        stage('Train') {
+            steps {
+                sh '''
+                    podman run --rm \
+                        --network ml-network \
+                        -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
+                        ml-training:${BUILD_NUMBER}
+                '''
+            }
         }
     }
-
-    // post {
-    //     always {
-    //         sh '''
-    //             echo "Cleaning MLflow container..."
-    //             podman rm -f mlflow 2>/dev/null || true
-    //         '''
-    //     }
-    // }
 }
