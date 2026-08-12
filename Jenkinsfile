@@ -40,11 +40,12 @@ pipeline {
             steps {
                 sh '''
                     podman run --rm \
-                        --network ml-network \
-                        -e MLFLOW_TRACKING_URI="${MLFLOW_TRACKING_URI}" \
-                        -e GIT_COMMIT="${GIT_COMMIT}" \
-                        -e GIT_PYTHON_REFRESH="${GIT_PYTHON_REFRESH}" \
-                        ml-training:${BUILD_NUMBER}
+                --network ml-network \
+                -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
+                -e MLFLOW_S3_ENDPOINT_URL=http://minio:9000 \
+                -e AWS_ACCESS_KEY_ID=minioadmin \
+                -e AWS_SECRET_ACCESS_KEY=minioadmin123 \
+                ml-training:${BUILD_NUMBER}
                 '''
             }
         }
