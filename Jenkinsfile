@@ -40,7 +40,7 @@ pipeline {
             steps {
                 sh '''
                    podman run --rm \
-                    -v "$XDG_RUNTIME_DIR/podman/podman.sock:/run/podman/podman.sock" \
+                    -v "$XDG_RUNTIME_DIR/podman/podman.sock:/podman/podman.sock" \
                     -v trivy-cache:/root/.cache \
                     docker.io/aquasec/trivy:0.72.0 \
                     image \
