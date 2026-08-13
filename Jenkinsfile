@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         MLFLOW_TRACKING_URI = 'http://mlflow:5000'
-        //GIT_PYTHON_REFRESH = 'quiet'
+        GIT_PYTHON_REFRESH = 'quiet'
     }
 
     stages {
@@ -13,13 +13,13 @@ pipeline {
                 checkout scm
 
                 sh '''
-                    echo "===== WORKSPACE ====="
+                    echo "===== WORKSPACE new ====="
                     pwd
                     ls -la
                     find . -maxdepth 2 -type f | sort
 
-                    echo "===== GIT INFORMATION one line ====="
-                    echo "GIT_COMMIT=${$GIT_PYTHON_GIT_EXECUTABLE:-git} rev-parse HEAD"
+                    echo "===== GIT INFORMATION ====="
+                    echo "GIT_COMMIT=${GIT_COMMIT}"
                     git rev-parse HEAD
                     
                 '''
