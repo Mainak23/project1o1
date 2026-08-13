@@ -13,4 +13,9 @@ RUN pip install --upgrade pip \
 
 COPY src/ ./src/
 
+RUN useradd --create-home --shell /bin/bash appuser \
+    && chown -R appuser:appuser /app
+
+USER appuser
+
 CMD ["python", "src/new.py"]

@@ -46,3 +46,35 @@ PATH=
 /usr/local/bin
 :/usr/bin
 :/bin
+
+python:3.13-slim
+       │
+       ▼
+     /app
+       │
+       ▼
+copy requirements.txt
+       │
+       ▼
+create /opt/venv
+       │
+       ▼
+PATH → /opt/venv/bin
+       │
+       ▼
+install ML dependencies
+       │
+       ▼
+copy src/
+       │
+       ▼
+create appuser
+       │
+       ▼
+appuser owns /app
+       │
+       ▼
+USER appuser
+       │
+       ▼
+python src/new.py
