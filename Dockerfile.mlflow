@@ -17,34 +17,29 @@ USER appuser
 CMD ["python", "src/new.py"]
 
 
+
+#next style
 FROM python:3.13-slim
 
-WORKDIR /app
-
-COPY requirements.txt .
-COPY src/new.py .
-
-RUN python -m venv .
-RUN pip install --upgrade pip
-RUN source venv/bin/activate 
-RUN pip install --no-cache-dir -r requirements.txt
-
-CMD ["python", "new.py"]
-
-FROM python:3.13-slim
-
-WORKDIR /app
+WORKDIR /ap
 
 COPY requirements.txt .
 
-RUN python -m pip install --upgrade pip \
+RUN python -m venv /op/venv
+
+ENV PATH="/op/venv/bin:$PATH"
+
+RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
 COPY src/ ./src/
 
 RUN useradd --create-home --shell /bin/bash appuser \
-    && chown -R appuser:appuser /app
+    && chown -R appuser:appuser /ap
 
 USER appuser
 
 CMD ["python", "src/new.py"]
+
+#multistage build
+

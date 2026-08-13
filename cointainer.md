@@ -95,8 +95,101 @@ python src/new.py
         ↓
 8️⃣ Optimize individual heavy libraries
 
+sequirity 
+✅ python:3.13-slim
+✅ non-root appuser
+✅ no secrets in Dockerfile
+✅ no --privileged
+✅ .dockerignore
+✅ pinned dependencies
+✅ image scanning
+✅ image version = Jenkins BUILD_NUMBER
+✅ internal ml-network
+✅ resource limits
+✅ separate MLflow/MinIO services
+
 
 RUN useradd --create-home --shell /bin/bash appuser \
     && chown -R appuser:appuser /app
 
 "Create a normal user called appuser, then give that user ownership of /app."
+
+Builder
+│
+├── gcc
+├── g++
+├── Python
+├── venv
+│   ├── MLflow
+│   ├── sklearn
+│   ├── pandas
+│   └── boto3
+│
+└── temporary build stuff
+         │
+         │ copy only
+         ▼
+Runtime
+│
+├── Python
+├── venv
+│   ├── MLflow
+│   ├── sklearn
+│   ├── pandas
+│   └── boto3
+│
+└── your code
+
+COPY --from=builder /opt/venv /opt/venv
+"From the builder stage, copy /opt/venv into /opt/venv in the current stage."
+
+
+BUILDER
+python:3.13
+│
+├── gcc
+├── g++
+├── build tools
+└── /opt/venv
+        │
+        │ COPY
+        ▼
+RUNTIME
+python:3.13-slim
+│
+├── /opt/venv
+└── src/
+This is often the point of multi-stage builds: the builder can be heavier, while the runtime is smaller.
+
+Multi-stage Docker — interview answer
+
+I use multi-stage Docker builds when the application needs build-time dependencies that are not required at runtime.
+"Multi-stage reduces the image by removing build-time dependencies; it cannot remove runtime dependencies like PyTorch that the application actually needs."
+
+For PyTorch:
+
+Builder
+├── gcc              ← can remove
+├── g++              ← can remove
+├── build tools      ← can remove
+└── PyTorch          ← MUST KEEP
+
+Runtime:
+
+├── PyTorch          ← still needed
+├── Transformers     ← still needed
+└── application      ← still needed
+
+For example:
+
+Builder:
+gcc, g++, make → build Python packages
+                    ↓
+Runtime:
+Python + packages + application
+
+This gives:
+
+Smaller production image
+Fewer unnecessary tools/vulnerabilities
+Cleaner runtime environment
