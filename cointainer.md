@@ -249,3 +249,8 @@ $XDG_RUNTIME_DIR
 
 Does the Podman communication doorway actually exist?"
 ls -l $XDG_RUNTIME_DIR/podman/podman.sock
+
+podman run --rm \
+  -v "$XDG_RUNTIME_DIR/podman/podman.sock:/podman/podman.sock" \
+  docker.io/aquasec/trivy:0.72.0 \
+  ls -l /podman/podman.sock

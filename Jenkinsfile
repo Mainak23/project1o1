@@ -45,7 +45,7 @@ pipeline {
                     docker.io/aquasec/trivy:0.72.0 \
                     image \
                     --image-src podman \
-                    --podman-host unix:///run/podman/podman.sock \
+                    --podman-host unix:///podman/podman.sock \
                     ml-training:105
                 '''
             }
