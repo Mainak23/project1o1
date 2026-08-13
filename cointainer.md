@@ -78,3 +78,19 @@ USER appuser
        │
        ▼
 python src/new.py
+
+1️⃣ Remove unnecessary dependencies
+        ↓
+2️⃣ Don't package datasets/models/artifacts
+        ↓
+3️⃣ Use python:3.13-slim
+        ↓
+4️⃣ Use --no-cache-dir
+        ↓
+5️⃣ Use .dockerignore
+        ↓
+6️⃣ Choose CPU/GPU dependencies correctly
+        ↓
+7️⃣ Multi-stage build if compilation is required
+        ↓
+8️⃣ Optimize individual heavy libraries
