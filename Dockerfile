@@ -4,14 +4,13 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-RUN python -m pip install --upgrade pip \
+RUN python -m venv /opt/venv
+
+ENV PATH="/opt/venv/bin:$PATH"
+
+RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
 COPY src/ ./src/
-
-RUN useradd --create-home --shell /bin/bash appuser \
-    && chown -R appuser:appuser /app
-
-USER appuser
 
 CMD ["python", "src/new.py"]

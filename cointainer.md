@@ -34,3 +34,15 @@ CMD = when starting the container
          IMAGE             CONTAINER
 
 One more important thing: podman run can override CMD
+
+ENV PATH="/opt/venv/bin:$PATH"
+Make /opt/venv/bin the first place Linux looks when I run commands like python or pip."
+
+PATH is an environment variable containing directories where Linux looks for executable programs.
+
+For example, inside your container:
+
+PATH=
+/usr/local/bin
+:/usr/bin
+:/bin
