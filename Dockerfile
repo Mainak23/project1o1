@@ -3,8 +3,15 @@ FROM python:3.13-slim
 WORKDIR /app
 
 COPY requirements.txt .
-COPY src/new.py .
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "new.py"]
+COPY src/ ./src/
+
+RUN useradd --create-home --shell /bin/bash appuser \
+    && chown -R appuser:appuser /app
+
+USER appuser
+
+CMD ["python", "src/new.py"]

@@ -10,3 +10,27 @@ COPY <source> <destination>
      │        └── ./src/
      │
      └── src/
+
+During image creation, execute this command and save the result into the image.
+RUN = while building the image
+
+When somebody creates a container from me, this is the default command to execute.
+CMD = when starting the container
+
+                 Dockerfile
+                     │
+                     ▼
+              podman build
+                     │
+            ┌────────┴────────┐
+            │                 │
+           RUN               CMD
+            │                 │
+       BUILD TIME          RUNTIME
+            │                 │
+      install packages    run Python
+            │                 │
+            ▼                 ▼
+         IMAGE             CONTAINER
+
+One more important thing: podman run can override CMD
