@@ -2,9 +2,50 @@
 advantage:
 Rootless containers reduce the privilege available to a compromised container compared with running the container runtime as root.
 
+
+ssh mainak@http://localhost:8080/
 #jankins -MLflow configureation
 ssh <username>@<jenkins-server-ip>
+
+
+You might have been somewhere Jenkins could access:
+
+/tmp
 sudo -u jenkins -s
+mainak
+   │
+   └── /home/mainak
+          │
+          └── sudo → jenkins
+                     ↓
+              jenkins@mainak:/home/mainak$
+
+
+
+
+sudo
+ └── -i            → login shell
+ └── -u jenkins    → as Jenkins
+
+It says:
+
+"Become Jenkins as if Jenkins had logged in normally."
+
+sudo -iu jenkins
+mainak
+   │
+   └── sudo -iu jenkins
+             ↓
+       Jenkins user
+             ↓
+       Jenkins home
+             ↓
+            $
+
+
+
+
+
 cheack:
 whoami
 cd /tmp
@@ -544,3 +585,15 @@ podman exec -it mlflow bash
 python -c "import boto3; print(boto3.__version__)"
 podman restart mlflow
 podman exec mlflow python -c "import boto3; print(boto3.__version__)"
+
+start it necxt day 
+podman start mlflow
+podman start minio
+
+we have
+volume mounts ✅
+network ✅
+port mappings ✅
+environment variables ✅
+container name ✅
+command/entrypoint ✅

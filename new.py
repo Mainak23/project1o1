@@ -83,7 +83,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 # ============================================================
 
 C = 9
-MAX_ITER = 1
+MAX_ITER = 10
 SOLVER = "liblinear"
 PENALTY = "l1"
 
@@ -173,7 +173,7 @@ with mlflow.start_run(
 
         "team": "data_science",
 
-        "version": "v1"
+        "version": "v10"
     })
 
 
