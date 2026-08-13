@@ -13,7 +13,7 @@ pipeline {
                 checkout scm
 
                 sh '''
-                    echo "===== WORKSPACE ====="
+                    echo "===== WORKSPACE new ====="
                     pwd
                     ls -la
                     find . -maxdepth 2 -type f | sort
