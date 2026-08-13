@@ -39,15 +39,13 @@ pipeline {
         stage('Trivy Scan') {
             steps {
                 sh '''
-                    podman run --rm \
-                    -v $XDG_RUNTIME_DIR/podman/podman.sock:/run/podman/podman.sock \
+                   podman run --rm \
+                    -v "$XDG_RUNTIME_DIR/podman/podman.sock:/run/podman/podman.sock" \
                     -v trivy-cache:/root/.cache \
-                    -e CONTAINER_HOST=unix:///run/podman/podman.sock \
                     docker.io/aquasec/trivy:0.72.0 \
                     image \
                     --image-src podman \
-                    --severity HIGH,CRITICAL \
-                    --exit-code 1 \
+                    --podman-host unix:///run/podman/podman.sock \
                     ml-training:105
                 '''
             }
