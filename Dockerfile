@@ -3,9 +3,8 @@ FROM python:3.13-slim
 WORKDIR /app
 
 COPY requirements.txt .
+COPY src/new.py .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
-
-CMD ["python", "src/new.py"]
+CMD ["python", "new.py"]
