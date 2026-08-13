@@ -19,7 +19,7 @@ pipeline {
                     find . -maxdepth 2 -type f | sort
 
                     echo "===== GIT INFORMATION ====="
-                    echo "GIT_COMMIT=${GIT_COMMIT}"
+                    echo "GIT_COMMIT=${$GIT_PYTHON_GIT_EXECUTABLE:-git} rev-parse HEAD"
                     git rev-parse HEAD
                     
                 '''
