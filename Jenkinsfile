@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         MLFLOW_TRACKING_URI = 'http://mlflow:5000'
-        GIT_PYTHON_REFRESH = 'quiet'
+        //GIT_PYTHON_REFRESH = 'quiet'
     }
 
     stages {
