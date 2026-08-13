@@ -193,3 +193,59 @@ This gives:
 Smaller production image
 Fewer unnecessary tools/vulnerabilities
 Cleaner runtime environment
+
+Trivy identifies the software packages and versions inside the image, matches them against its vulnerability database, assigns/report severities such as LOW, MEDIUM, HIGH and CRITICAL, and Jenkins can use those results as a security quality gate
+
+podman pull docker.io/aquasec/trivy:0.72.0
+podman images | grep trivy
+
+                  HOST
+┌─────────────────────────────────────┐
+│                                     │
+│  Podman                             │
+│    │                                │
+│    │ manages                        │
+│    ▼                                │
+│  ml-training:91                     │
+│                                     │
+│    ▲                                │
+│    │                                │
+│    │ communication                  │
+│    │                                │
+│  podman.sock 🔌                     │
+│    │                                │
+│    │ mounted into                   │
+│    ▼                                │
+│  ┌──────────────────────┐           │
+│  │   Trivy container    │           │
+│  │                      │           │
+│  │   Trivy              │           │
+│  │      │               │           │
+│  │      └── asks Podman │           │
+│  │          to inspect  │           │
+│  │          image       │           │
+│  └──────────────────────┘           │
+│                                     │
+└─────────────────────────────────────┘
+
+Container isolation means:
+
+Trivy container cannot automatically see the host's Podman.
+
+Podman socket means:
+
+A communication channel that lets Trivy talk to the host's Podman.
+
+Mounting the socket means:
+
+Give Trivy access to that communication channel.
+
+Start Podman's communication doorway for my user.
+systemctl --user enable --now podman.socket
+
+The temporary runtime directory belonging to the current user.
+$XDG_RUNTIME_DIR
+
+
+Does the Podman communication doorway actually exist?"
+ls -l $XDG_RUNTIME_DIR/podman/podman.sock
