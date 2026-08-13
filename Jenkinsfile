@@ -45,6 +45,7 @@ pipeline {
                 -e MLFLOW_S3_ENDPOINT_URL=http://minio:9000 \
                 -e AWS_ACCESS_KEY_ID=minioadmin \
                 -e AWS_SECRET_ACCESS_KEY=minioadmin123 \
+                -e GIT_COMMIT="${GIT_COMMIT}"\
                 ml-training:${BUILD_NUMBER}
                 '''
             }
