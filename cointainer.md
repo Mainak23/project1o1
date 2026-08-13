@@ -94,3 +94,9 @@ python src/new.py
 7️⃣ Multi-stage build if compilation is required
         ↓
 8️⃣ Optimize individual heavy libraries
+
+
+RUN useradd --create-home --shell /bin/bash appuser \
+    && chown -R appuser:appuser /app
+
+"Create a normal user called appuser, then give that user ownership of /app."

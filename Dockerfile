@@ -14,7 +14,7 @@ RUN pip install --upgrade pip \
 COPY src/ ./src/
 
 RUN useradd --create-home --shell /bin/bash appuser \
-    && chown -R appuser:appuser /app
+    && chown -R appuser:appuser /ap
 
 USER appuser
 
