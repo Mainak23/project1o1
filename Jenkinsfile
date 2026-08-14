@@ -47,7 +47,7 @@ pipeline {
 
                     podman run --rm \
                         --userns=keep-id \
-                        -v "$XDG_RUNTIME_DIR/podman/podman.sock:/podman/podman.sock" \
+                        -v "$XDG_RUNTIME_DIR/podman/podman.sock:$XDG_RUNTIME_DIR/podman/podman.sock"  \
                         -v trivy-cache:/home/jenkins/.cache \
                         docker.io/aquasec/trivy:0.72.0 \
                         image \
