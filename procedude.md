@@ -54,6 +54,15 @@ remove stale runtime state:(temporary runtime state is stale because the machine
 rm -rf /tmp/storage-run-111/containers
 rm -rf /tmp/storage-run-111/libpod/tmp
 
+
+ERRO[0002] Refreshing container bd48876902648144a3e92dc7d2375cbf0f32627978d164bab106d480d1bce039: acquiring lock 3 for container bd48876902648144a3e92dc7d2375cbf0f32627978d164bab106d480d1bce039: file exists 
+ERRO[0002] Refreshing container 6e2ebca9e7c0a8fd6b86ec5c767b6db5a480cab23410066d13ebfa9b30b896c0: acquiring lock 1 for container 6e2ebca9e7c0a8fd6b86ec5c767b6db5a480cab23410066d13ebfa9b30b896c0: file exists 
+ERRO[0002] Refreshing volume mlflow-data: acquiring lock 0 for volume mlflow-data: file exists 
+ERRO[0002] Refreshing volume minio-data: acquiring lock 2 for volume minio-data: file exists 
+ERRO[0002] Refreshing volume trivy-cache: acquiring lock 5 for volume trivy-cache: file exists 
+
+ss -ltnp | grep :5000
+
 rootless services/tools running as a specific Linux user, like your Jenkins + rootless Podman setup.
 "Where should programs put temporary files that belong to my currently running user session?"
 
