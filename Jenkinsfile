@@ -40,11 +40,27 @@ pipeline {
         stage('Trivy Scan') {
             steps {
                 sh '''
-                   trivy image \
+                SOCKET="/run/user/$(id -u)/podman/podman.sock"
+
+            # Make sure the socket exists
+            if [ ! -S "$SOCKET" ]; then
+                podman system service --time=0 unix://$SOCKET &
+                sleep 2
+            fi
+
+            podman run --rm \
+                --userns=keep-id \
+                -v "$SOCKET:$SOCKET" \
+                -v $HOME/.cache/trivy:/root/.cache/trivy \
+                -e HOME=/root \
+                docker.io/aquasec/trivy:0.72.0 \
+                image \
+                --image-src podman \
+                --podman-host "unix://$SOCKET" \
                 --severity HIGH,CRITICAL \
                 --exit-code 1 \
-                --cache-dir $HOME/.cache/trivy \
                 "localhost/ml-training:${BUILD_NUMBER}"
+        
         '''
                 
             }
