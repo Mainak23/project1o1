@@ -41,18 +41,17 @@ pipeline {
         stage('Trivy Scan') {
             steps {
                 sh '''
-                 echo "Saving image..."
+                 rm -f ml-training.tar
 
             podman save \
-                "localhost/ml-training:${BUILD_NUMBER}" \
-                -o ml-training.tar
-
-            echo "Scanning image with Trivy..."
+                --format docker-archive \
+                -o ml-training.tar \
+                "localhost/ml-training:${BUILD_NUMBER}"
 
             podman run --rm \
                 -v "$PWD/ml-training.tar:/scan/ml-training.tar:ro" \
                 -v trivy-cache:/root/.cache/trivy \
-                docker.io/aquasec/trivy:0.72.0:0.72.0 \
+                docker.io/aquasec/trivy:0.72.0 \
                 image \
                 --input /scan/ml-training.tar \
                 --severity HIGH,CRITICAL \
