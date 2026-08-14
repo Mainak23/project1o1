@@ -254,3 +254,141 @@ podman run --rm \
   -v "$XDG_RUNTIME_DIR/podman/podman.sock:/podman/podman.sock" \
   docker.io/aquasec/trivy:0.72.0 \
   ls -l /podman/podman.sock
+
+
+                         HOST
+┌──────────────────────────────────────────────────┐
+│                                                  │
+│                   Podman                        │
+│                     ▲                            │
+│                     │                            │
+│              🔌 Podman socket                    │
+│                     │                            │
+│                     │                            │
+│                 Trivy                            │
+│                                                  │
+│                                                  │
+│       ┌──────────── ml-network ─────────────┐    │
+│       │                                     │    │
+│       │   MLflow             MinIO          │    │
+│       │   10.89.0.2          10.89.0.3      │    │
+│       │      │                  ▲           │    │
+│       │      └──── S3/HTTP ─────┘           │    │
+│       │                                     │    │
+│       └─────────────────────────────────────┘    │
+│                                                  │
+
+
+
+
+{
+          "name": "ml-network",
+          "id": "d812a0cfffb53ff838adb2a43e475d8936452124613b6bb74367d1f0e0494637",
+          "driver": "bridge",
+          "network_interface": "podman1",
+          "created": "2026-08-12T09:51:50.872075926+05:30",
+          "subnets": [
+               {
+                    "subnet": "10.89.0.0/24",
+                    "gateway": "10.89.0.1"
+               }
+          ],
+          "ipv6_enabled": false,
+          "internal": false,
+          "dns_enabled": true,
+          "ipam_options": {
+               "driver": "host-local"
+          },
+          "containers": {
+               "6e2ebca9e7c0a8fd6b86ec5c767b6db5a480cab23410066d13ebfa9b30b896c0": {
+                    "name": "mlflow",
+                    "interfaces": {
+                         "eth0": {
+                              "subnets": [
+                                   {
+                                        "ipnet": "10.89.0.2/24",
+                                        "gateway": "10.89.0.1"
+                                   }
+                              ],
+                              "mac_address": "62:65:91:8b:2e:56"
+                         }
+                    }
+               },
+               "bd48876902648144a3e92dc7d2375cbf0f32627978d164bab106d480d1bce039": {
+                    "name": "minio",
+                    "interfaces": {
+                         "eth0": {
+                              "subnets": [
+                                   {
+                                        "ipnet": "10.89.0.3/24",
+                                        "gateway": "10.89.0.1"
+                                   }
+                              ],
+                              "mac_address": "02:8b:0a:27:c4:e3"
+                         }
+                    }
+               }
+          }
+     }
+]
+
+ipv6_enabled: false → The Podman network supports IPv4 only, not IPv6.
+internal: false → Containers can communicate outside this Podman network through the host's network.
+dns_enabled: true → Podman provides internal DNS, so containers can reach each other by name, e.g. http://minio:9000.
+
+
+HOST                              TRIVY
+/run/user/111/podman/             /podman/
+podman.sock          ──────────→  podman.sock
+
+the socket exists inside Trivy
+Can Trivy actually communicate with Podman through that socket?
+
+First check the socket from inside the curl container
+On your Jenkins host, the socket belongs to Jenkins:
+
+/run/user/111/podman/podman.sock
+        │
+        └── jenkins:jenkins
+
+HOST
+─────────────────────────────
+
+Jenkins UID 111
+      │
+      │ owns
+      ▼
+podman.sock
+      │
+      │ mounted
+      ▼
+
+TRIVY/CURL CONTAINER
+─────────────────────────────
+
+User namespace
+      │
+      │ <-- this was the problem
+      ▼
+Container user
+
+
+podman run --rm \
+  --userns=keep-id \
+  -v "$XDG_RUNTIME_DIR/podman/podman.sock:/podman/podman.sock" \
+  docker.io/curlimages/curl:latest \
+  -v --unix-socket /podman/podman.sock \
+  http://d/_ping
+
+podman run --rm \
+  --userns=keep-id \
+  -v "$XDG_RUNTIME_DIR/podman/podman.sock:/podman/podman.sock" \
+  docker.io/aquasec/trivy:0.72.0 \
+  image \
+  --image-src podman \
+  --podman-host unix:///podman/podman.sock \
+  localhost/ml-training:105 
+
+
+
+  Where inside the container you make the volume available, and whether the application/user has permission to use that path.

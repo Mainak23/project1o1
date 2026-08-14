@@ -479,7 +479,13 @@ podman run -d \
     --name mlflow \
     --network ml-network \
     -p 5000:5000 \
-    -v mlflow-data:/mlflow-data \
+    -v mlflow-data:/mlflow-data \   
+
+    -v HOST_VOLUME : CONTAINER_PATH 
+    
+     "Take the Podman volume called mlflow-data and make it available inside the container at /mlflow-data."
+
+
     -e AWS_ACCESS_KEY_ID=minioadmin \
     -e AWS_SECRET_ACCESS_KEY=minioadmin123 \
     -e MLFLOW_S3_ENDPOINT_URL=http://minio:9000 \
@@ -597,6 +603,8 @@ port mappings ✅
 environment variables ✅
 container name ✅
 command/entrypoint ✅
+
+-v mlflow-data:/mlflow-data
 
 git comit unknow 
 

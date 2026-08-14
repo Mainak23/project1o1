@@ -40,13 +40,17 @@ pipeline {
             steps {
                 sh '''
                    podman run --rm \
-                    -v "$XDG_RUNTIME_DIR/podman/podman.sock:/podman/podman.sock" \
-                    -v trivy-cache:/root/.cache \
-                    docker.io/aquasec/trivy:0.72.0 \
-                    image \
-                    --image-src podman \
-                    --podman-host unix:///podman/podman.sock \
-                    ml-training:105
+                --userns=keep-id \
+                -v "$XDG_RUNTIME_DIR/podman/podman.sock:/podman/podman.sock" \
+                -v trivy-cache:/home/jenkins/.cache \
+                docker.io/aquasec/trivy:0.72.0 \
+                image \
+                --image-src podman \
+                --podman-host unix:///podman/podman.sock \
+                --cache-dir /home/jenkins/.cache/trivy \
+                --severity HIGH,CRITICAL \
+                --exit-code 1 \
+                localhost/ml-training:${BUILD_NUMBER}
                 '''
             }
         }
