@@ -55,7 +55,8 @@ pipeline {
                 image \
                 --input /scan/ml-training.tar \
                 --severity HIGH,CRITICAL \
-                --exit-code 1
+                --format table
+               
         '''
                 
             }

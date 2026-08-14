@@ -392,3 +392,19 @@ podman run --rm \
 
 
   Where inside the container you make the volume available, and whether the application/user has permission to use that path.
+
+  Podman
+  ↓
+OCI archive
+  ↓
+Trivy --input
+  ↓
+❌ format/layout mismatch
+
+Podman
+  ↓
+Docker-compatible archive
+  ↓
+Trivy --input
+  ↓
+✅ scan
