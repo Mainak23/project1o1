@@ -5,6 +5,7 @@ pipeline {
         MLFLOW_TRACKING_URI = 'http://mlflow:5000'
         GIT_PYTHON_REFRESH = 'quiet'
         XDG_RUNTIME_DIR = '/run/user/111'
+        PATH = "/var/lib/jenkins/bin:${env.PATH}"
     }
 
     stages {
@@ -40,6 +41,8 @@ pipeline {
         stage('Trivy Scan') {
             steps {
                 sh '''
+                 echo "$PATH"
+                which trivy
                 trivy --version
 
             trivy image \
