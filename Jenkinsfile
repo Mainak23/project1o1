@@ -47,12 +47,12 @@ pipeline {
 
                     podman run --rm \
                         --userns=keep-id \
-                        -v "$XDG_RUNTIME_DIR/podman/podman.sock:$XDG_RUNTIME_DIR/podman/podman.sock"  \
+                        -v "$XDG_RUNTIME_DIR/podman/podman.sock:$XDG_RUNTIME_DIR/podman/podman.sock"\
                         -v trivy-cache:/home/jenkins/.cache \
                         docker.io/aquasec/trivy:0.72.0 \
                         image \
                         --image-src podman \
-                        --podman-host unix:///podman/podman.sock \
+                        --podman-host unix://$XDG_RUNTIME_DIR/podman/podman.sock \
                         --cache-dir /home/jenkins/.cache/trivy \
                         --severity HIGH,CRITICAL \
                         --exit-code 1 \
