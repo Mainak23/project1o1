@@ -4,6 +4,7 @@ pipeline {
     environment {
         MLFLOW_TRACKING_URI = 'http://mlflow:5000'
         GIT_PYTHON_REFRESH = 'quiet'
+         XDG_RUNTIME_DIR = '/run/user/111'
     }
 
     stages {
