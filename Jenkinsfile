@@ -4,7 +4,7 @@ pipeline {
     environment {
         MLFLOW_TRACKING_URI = 'http://mlflow:5000'
         GIT_PYTHON_REFRESH = 'quiet'
-         PATH = "/var/lib/jenkins/bin:${env.PATH}"
+        XDG_RUNTIME_DIR = '/run/user/111'
     }
 
     stages {
@@ -43,6 +43,8 @@ pipeline {
                 trivy --version
 
             trivy image \
+                --image-src podman \
+                --podman-host "unix://$XDG_RUNTIME_DIR/podman/podman.sock" \
                 --severity HIGH,CRITICAL \
                 --exit-code 1 \
                 --cache-dir "$HOME/.cache/trivy" \
