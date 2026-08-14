@@ -17,7 +17,7 @@ pipeline {
                 sh '''
                     echo "===== WORKSPACE new ====="
                     pwd
-                    ls -la
+                    
                     find . -maxdepth 2 -type f | sort
 
                     echo "===== GIT INFORMATION ====="
