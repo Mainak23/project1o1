@@ -1,26 +1,50 @@
+import os
+import logging
 import mlflow
 import pandas as pd
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s"
+)
 
-MLFLOW_URI = "http://localhost:5000"
-
-mlflow.set_tracking_uri(MLFLOW_URI)
+logger = logging.getLogger(__name__)
 
 
-# Get all experiments
+mlflow.set_tracking_uri(
+    os.environ["MLFLOW_TRACKING_URI"]
+)
+git_commit = os.getenv("GIT_COMMIT", "unknown")
+
+
+logger.info("Connecting to MLflow: %s", MLFLOW_URI)
+
 experiments = mlflow.search_experiments()
+
+logger.info("Found %d experiments", len(experiments))
 
 results = []
 
 for experiment in experiments:
 
-    # Skip deleted experiments
     if experiment.lifecycle_stage != "active":
         continue
+
+    logger.info(
+        "Reading experiment: %s (ID=%s)",
+        experiment.name,
+        experiment.experiment_id
+    )
 
     runs = mlflow.search_runs(
         experiment_ids=[experiment.experiment_id],
         filter_string="attributes.status = 'FINISHED'",
+    )
+
+    logger.info(
+        "Found %d finished runs in %s",
+        len(runs),
+        experiment.name
     )
 
     if runs.empty:
@@ -44,28 +68,28 @@ for experiment in experiments:
 
 df = pd.DataFrame(results)
 
+if df.empty:
+    logger.warning("No finished model runs found")
+else:
 
-# Example ranking: highest F1
-top_3 = (
-    df
-    .dropna(subset=["f1"])
-    .sort_values("f1", ascending=False)
-    .head(3)
-)
+    top_3 = (
+        df
+        .dropna(subset=["f1"])
+        .sort_values("f1", ascending=False)
+        .head(3)
+    )
 
+    logger.info("========== TOP 3 MODELS ==========")
 
-print("\n===== TOP 3 MODELS =====\n")
+    for rank, (_, model) in enumerate(top_3.iterrows(), start=1):
 
-print(
-    top_3[
-        [
-            "experiment_name",
-            "run_id",
-            "f1",
-            "accuracy",
-            "precision",
-            "recall",
-            "artifact_uri",
-        ]
-    ].to_string(index=False)
-)
+        logger.info(
+            "#%d | Experiment=%s | Run ID=%s | F1=%.4f | Accuracy=%.4f",
+            rank,
+            model["experiment_name"],
+            model["run_id"],
+            model["f1"],
+            model["accuracy"],
+        )
+
+    logger.info("==================================")
