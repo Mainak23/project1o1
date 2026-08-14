@@ -18,6 +18,8 @@ pipeline {
                     echo "===== WORKSPACE new ====="
                     pwd
                     
+                    echo "training files:"
+                    
                     find . -maxdepth 2 -type f | sort
 
                     echo "===== GIT INFORMATION ====="
