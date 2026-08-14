@@ -52,7 +52,7 @@ pipeline {
             podman run --rm \
                 -v "$PWD/ml-training.tar:/scan/ml-training.tar:ro" \
                 -v trivy-cache:/root/.cache/trivy \
-                docker.io/aquasecurity/trivy:0.72.0 \
+                docker.io/aquasec/trivy:0.72.0:0.72.0 \
                 image \
                 --input /scan/ml-training.tar \
                 --severity HIGH,CRITICAL \
