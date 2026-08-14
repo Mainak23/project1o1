@@ -40,24 +40,27 @@ pipeline {
         stage('Trivy Scan') {
             steps {
                 sh '''
-                   echo "USER=$(whoami)"
+                   SOCKET="/run/user/111/podman/podman.sock"
+
+                    echo "USER=$(whoami)"
                     echo "UID=$(id -u)"
-                    echo "XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR"
-                    ls -l "$XDG_RUNTIME_DIR/podman/podman.sock"
+                    echo "SOCKET=$SOCKET"
+                    ls -l "$SOCKET"
 
                     podman run --rm \
                         --userns=keep-id \
-                        -v "$XDG_RUNTIME_DIR/podman/podman.sock:$XDG_RUNTIME_DIR/podman/podman.sock"\
+                        -v "$SOCKET:$SOCKET" \
                         -v trivy-cache:/home/jenkins/.cache \
                         docker.io/aquasec/trivy:0.72.0 \
                         image \
                         --image-src podman \
-                        --podman-host unix://$XDG_RUNTIME_DIR/podman/podman.sock \
+                        --podman-host "unix://$SOCKET" \
                         --cache-dir /home/jenkins/.cache/trivy \
                         --severity HIGH,CRITICAL \
                         --exit-code 1 \
-                        localhost/ml-training:${BUILD_NUMBER}
-                '''
+                        "localhost/ml-training:${BUILD_NUMBER}"
+        '''
+                
             }
         }
 
