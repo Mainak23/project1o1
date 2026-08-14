@@ -4,7 +4,7 @@ pipeline {
     environment {
         MLFLOW_TRACKING_URI = 'http://mlflow:5000'
         GIT_PYTHON_REFRESH = 'quiet'
-         XDG_RUNTIME_DIR = '/run/user/111'
+         PATH = "/var/lib/jenkins/bin:${env.PATH}"
     }
 
     stages {
@@ -40,27 +40,13 @@ pipeline {
         stage('Trivy Scan') {
             steps {
                 sh '''
-                SOCKET="/run/user/$(id -u)/podman/podman.sock"
+                trivy --version
 
-            # Make sure the socket exists
-            if [ ! -S "$SOCKET" ]; then
-                podman system service --time=0 unix://$SOCKET &
-                sleep 2
-            fi
-
-            podman run --rm \
-                --userns=keep-id \
-                -v "$SOCKET:$SOCKET" \
-                -v $HOME/.cache/trivy:/root/.cache/trivy \
-                -e HOME=/root \
-                docker.io/aquasec/trivy:0.72.0 \
-                image \
-                --image-src podman \
-                --podman-host "unix://$SOCKET" \
+            trivy image \
                 --severity HIGH,CRITICAL \
                 --exit-code 1 \
+                --cache-dir "$HOME/.cache/trivy" \
                 "localhost/ml-training:${BUILD_NUMBER}"
-        
         '''
                 
             }
