@@ -1,11 +1,22 @@
 FROM python:3.13-slim
 
-WORKDIR /app
+WORKDIR /ap
 
 COPY requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+RUN python -m venv /op/venv
 
-CMD ["python", "new.py"]
+ENV PATH="/op/venv/bin:$PATH"
+
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
+
+COPY src/ ./src/
+
+RUN useradd --create-home --shell /bin/bash appuser \
+    && chown -R appuser:appuser /ap
+
+USER appuser
+
+CMD ["python", "src/main.py"]
