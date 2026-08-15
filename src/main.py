@@ -1,7 +1,7 @@
 import logging
 import subprocess
 import sys
-
+import os
 
 logging.basicConfig(
     level=logging.INFO,
@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 SCRIPTS = [
-    "select_top_models.py",
-    "register_models.py",
-    "promote_best_model.py",
+    os.path.join(os.path.dirname(__file__), "select_top_models.py"),
+    os.path.join(os.path.dirname(__file__), "register_models.py"),
+    os.path.join(os.path.dirname(__file__), "promote_best_model.py"),
 ]
 
 
