@@ -1,22 +1,7 @@
-import logging
 import os
+import logging
 import mlflow
-from mlflow import MlflowClient
-
-
-# --------------------------------------------------
-# Configuration
-# --------------------------------------------------
-
-MLFLOW_URI=mlflow.set_tracking_uri(
-    os.environ["MLFLOW_TRACKING_URI"]
-)
-MODEL_NAME = "ml-training"
-
-PRIMARY_METRIC = "f1"
-
-# Compare only these registered versions
-CANDIDATE_VERSIONS = [1, 2, 3]
+from mlflow.tracking import MlflowClient
 
 
 # --------------------------------------------------
@@ -35,91 +20,125 @@ logger = logging.getLogger(__name__)
 # MLflow
 # --------------------------------------------------
 
+MLFLOW_URI = os.environ["MLFLOW_TRACKING_URI"]
+
 mlflow.set_tracking_uri(MLFLOW_URI)
 
 client = MlflowClient()
 
+MODEL_NAME = "ml-training"
+PRIMARY_METRIC = "f1"
 
-def get_best_model():
+
+# --------------------------------------------------
+# Find top 2 registered models
+# --------------------------------------------------
+
+def get_top_models():
+
+    versions = client.search_model_versions(
+        f"name='{MODEL_NAME}'"
+    )
 
     candidates = []
 
-    for version_number in CANDIDATE_VERSIONS:
-
-        version = client.get_model_version(
-            name=MODEL_NAME,
-            version=str(version_number)
-        )
+    for version in versions:
 
         run_id = version.run_id
 
+        if not run_id:
+            continue
+
         run = client.get_run(run_id)
 
-        metric_value = run.data.metrics.get(PRIMARY_METRIC)
+        metric = run.data.metrics.get(PRIMARY_METRIC)
 
-        if metric_value is None:
+        if metric is None:
             logger.warning(
                 "Version %s has no metric '%s'",
-                version_number,
+                version.version,
                 PRIMARY_METRIC
             )
             continue
 
         candidates.append({
-            "version": version_number,
+            "version": version.version,
             "run_id": run_id,
-            "metric": metric_value
+            "metric": metric
         })
 
         logger.info(
-            "Candidate | version=%s | run_id=%s | %s=%.4f",
-            version_number,
+            "Model | version=%s | run_id=%s | %s=%.4f",
+            version.version,
             run_id,
             PRIMARY_METRIC,
-            metric_value
+            metric
         )
 
-    if not candidates:
-        raise RuntimeError("No valid model candidates found")
+    if len(candidates) < 2:
+        raise RuntimeError(
+            "Need at least 2 valid registered model versions"
+        )
 
-    best = max(
-        candidates,
-        key=lambda x: x["metric"]
+    candidates.sort(
+        key=lambda x: x["metric"],
+        reverse=True
     )
 
-    return best
+    return candidates[:2]
 
 
-def promote_model(best):
+# --------------------------------------------------
+# Promote models
+# --------------------------------------------------
 
-    version = str(best["version"])
+def promote_models(top_models):
 
-    logger.info(
-        "Best model: version=%s | run_id=%s | %s=%.4f",
-        version,
-        best["run_id"],
-        PRIMARY_METRIC,
-        best["metric"]
-    )
+    champion = top_models[0]
+    candidate = top_models[1]
 
+    # Best model
     client.set_registered_model_alias(
         name=MODEL_NAME,
         alias="champion",
-        version=version
+        version=champion["version"]
+    )
+
+    # Second-best model
+    client.set_registered_model_alias(
+        name=MODEL_NAME,
+        alias="candidate",
+        version=candidate["version"]
     )
 
     logger.info(
-        "Model version %s promoted as 'champion'",
-        version
+        "CHAMPION | version=%s | run_id=%s | f1=%.4f",
+        champion["version"],
+        champion["run_id"],
+        champion["metric"]
+    )
+
+    logger.info(
+        "CANDIDATE | version=%s | run_id=%s | f1=%.4f",
+        candidate["version"],
+        candidate["run_id"],
+        candidate["metric"]
     )
 
 
+# --------------------------------------------------
+# Main
+# --------------------------------------------------
+
 if __name__ == "__main__":
 
-    logger.info("Starting model promotion")
+    logger.info(
+        "Starting model promotion | MLflow=%s",
+        MLFLOW_URI
+    )
 
-    best_model = get_best_model()
+    top_models = get_top_models()
 
-    promote_model(best_model)
+    promote_models(top_models)
 
     logger.info("Model promotion completed")
