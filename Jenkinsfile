@@ -30,7 +30,7 @@ pipeline {
             }
         }
 
-        stage('Build ML Training Image') {
+        stage('Build ML Register Image') {
             steps {
                 sh '''
                     podman build \
@@ -64,7 +64,7 @@ pipeline {
         //     }
         // }
 
-        stage('Train') {
+        stage('Register model') {
             steps {
                 sh '''
                     podman run --rm \
