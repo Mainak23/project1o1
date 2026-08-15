@@ -16,7 +16,7 @@ mlflow.set_tracking_uri(MLFLOW_URI)
 client = MlflowClient()
 
 MODEL_NAME = "ml-training"
-EXPERIMENT_NAME = "ml-training"
+EXPERIMENT_NAME = "minio-test"
 
 
 def get_top_runs():
