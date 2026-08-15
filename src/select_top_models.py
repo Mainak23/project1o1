@@ -12,7 +12,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-mlflow.set_tracking_uri(
+MLFLOW_URI=mlflow.set_tracking_uri(
     os.environ["MLFLOW_TRACKING_URI"]
 )
 git_commit = os.getenv("GIT_COMMIT", "unknown")
