@@ -617,3 +617,5 @@ command/entrypoint ✅
 
 git comit unknow 
 
+rm -f /var/lib/jenkins/.cache/trivy/fanal
+rm: cannot remove '/var/lib/jenkins/.cache/trivy/fanal': Is a directory
