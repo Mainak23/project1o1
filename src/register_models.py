@@ -60,7 +60,7 @@ def register_models():
 
             result = mlflow.register_model(
                 model_uri=model_uri,
-                name=MODEL_NAME
+                name=f"{MODEL_NAME}_{rank}"
             )
 
             logger.info(
