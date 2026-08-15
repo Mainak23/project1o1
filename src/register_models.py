@@ -1,8 +1,8 @@
-import logging
 import os
+import logging
 import mlflow
 from mlflow.tracking import MlflowClient
-#ghh
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
@@ -10,53 +10,69 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-MLFLOW_URI=mlflow.set_tracking_uri(
-    os.environ["MLFLOW_TRACKING_URI"]
-)
-MODEL_NAME = "ml-training"
-
-
+MLFLOW_URI = os.environ["MLFLOW_TRACKING_URI"]
+mlflow.set_tracking_uri(MLFLOW_URI)
 
 client = MlflowClient()
 
+MODEL_NAME = "ml-training"
+EXPERIMENT_NAME = "ml-training"
 
-# Top 3 runs selected by your previous script
-TOP_RUN_IDS = [
-    "run_id_1",
-    "run_id_2",
-    "run_id_3",
-]
+
+def get_top_runs():
+
+    experiment = client.get_experiment_by_name(EXPERIMENT_NAME)
+
+    if experiment is None:
+        raise Exception(f"Experiment not found: {EXPERIMENT_NAME}")
+
+    runs = client.search_runs(
+        experiment_ids=[experiment.experiment_id],
+        filter_string="attributes.status = 'FINISHED'",
+        order_by=["metrics.accuracy DESC"],
+        max_results=3
+    )
+
+    return runs
 
 
 def register_models():
-    logger.info("Connecting to MLflow: %s", MLFLOW_URI)
 
-    for rank, run_id in enumerate(TOP_RUN_IDS, start=1):
+    top_runs = get_top_runs()
+
+    logger.info("Found %d top runs", len(top_runs))
+
+    for rank, run in enumerate(top_runs, start=1):
+
+        run_id = run.info.run_id
+        accuracy = run.data.metrics.get("accuracy")
 
         model_uri = f"runs:/{run_id}/model"
 
         logger.info(
-            "Registering #%d model | run_id=%s | uri=%s",
+            "Registering #%d | run_id=%s | accuracy=%s",
             rank,
             run_id,
-            model_uri
+            accuracy
         )
 
         try:
+
             result = mlflow.register_model(
                 model_uri=model_uri,
                 name=MODEL_NAME
             )
 
             logger.info(
-                "Registered successfully | run_id=%s | version=%s",
+                "SUCCESS | run_id=%s | version=%s",
                 run_id,
                 result.version
             )
 
         except Exception:
+
             logger.exception(
-                "Failed to register model | run_id=%s",
+                "FAILED | run_id=%s",
                 run_id
             )
 
