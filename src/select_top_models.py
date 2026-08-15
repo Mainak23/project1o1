@@ -1,6 +1,5 @@
 import os
 import logging
-from turtle import pd
 import mlflow
 import pandas as pd
 
