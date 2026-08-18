@@ -56,7 +56,7 @@ pipeline {
                 sh '''
                     podman build \
                     -t ml-training:${BUILD_NUMBER} \
-                    ./training
+                    ./regigster
                 '''
                 }
            
@@ -106,7 +106,7 @@ pipeline {
                 sh '''
                     podman build \
                     -t ml-serving:${BUILD_NUMBER} \
-                    ./serving
+                    ./deployment
                 '''
             }
         }
