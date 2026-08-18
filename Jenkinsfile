@@ -10,11 +10,7 @@ pipeline {
 
     stages {
 
-        stage('Clean Workspace') {
-            steps {
-                deleteDir()
-            }
-        }
+        
 
         stage('Checkout') {
             steps {
@@ -122,6 +118,12 @@ pipeline {
                 -e GIT_COMMIT="${GIT_COMMIT}"\
                 ml-serving:${BUILD_NUMBER}
                 '''
+            }
+        }
+
+        stage('Clean Workspace') {
+            steps {
+                deleteDir()
             }
         }
     }
