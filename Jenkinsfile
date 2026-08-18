@@ -29,6 +29,20 @@ pipeline {
                 '''
             }
         }
+        stage('Prepare Directories') {
+            steps {
+                sh '''
+                    rm -rf deployment regigster
+
+                    mkdir -p training
+                    mkdir -p regigster
+                    mkdir -p deployment
+
+                    echo "Directory structure:"
+                    find . -maxdepth 2 -type d | sort
+                '''
+            }
+        }
 
         stage('Build ML Register Image') {
             steps {

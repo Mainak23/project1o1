@@ -44,3 +44,6 @@ MLflow Model Registry
          champion    candidate
              │           │
             90%         10%
+
+
+ls -lah /var/lib/jenkins/workspace/mlops101
