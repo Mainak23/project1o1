@@ -114,17 +114,17 @@ podman volume inspect mlflow-data
      }
 
 
-/
-└── var/
-    └── lib/
-        └── jenkins/
-            └── .local/
-                └── share/
-                    └── containers/
-                        └── storage/
-                            └── volumes/
-                                └── mlflow-data/
-                                    └── _data/
+/var
+└── lib
+    └── jenkins                 ← Jenkins user's home
+    
+        └── .local              ← hidden directory
+            └── share
+                └── containers
+                    └── storage
+                        └── volumes
+                            └── codequality       ← your Podman volume
+                                └── _data         ← ACTUAL volume contents
 
 | Field               | Meaning                                                                | Production implication                                  |
 | ------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------- |
