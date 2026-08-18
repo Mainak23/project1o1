@@ -32,12 +32,12 @@ pipeline {
 
         stage('Build ML Register Image') {
             steps {
+                
+                sh '''
+                    podman build \
+                    -t ml-training:${BUILD_NUMBER} \
+                    ./training
                 '''
-                sh podman build \
-                -t ml-training:${BUILD_NUMBER} \
-                ./training
-
-                 '''
                 }
            
         }
@@ -87,8 +87,6 @@ pipeline {
                     podman build \
                     -t ml-serving:${BUILD_NUMBER} \
                     ./serving
-
-                   
                 '''
             }
         }
