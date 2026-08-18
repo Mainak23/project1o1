@@ -10,6 +10,12 @@ pipeline {
 
     stages {
 
+        stage('Clean Workspace') {
+            steps {
+                deleteDir()
+            }
+        }
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -34,7 +40,7 @@ pipeline {
                 sh '''
                     rm -rf deployment regigster
 
-                    mkdir -p training
+                    
                     mkdir -p regigster
                     mkdir -p deployment
 
