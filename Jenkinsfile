@@ -104,7 +104,7 @@ pipeline {
                     podman run -d \
                         --name ml-serving-test-${BUILD_NUMBER} \
                         --network ml-network \
-                        -p 8080:8080 \
+                        -p 8083:8080 \
                         -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
                         -e MLFLOW_S3_ENDPOINT_URL=http://minio:9000 \
                         -e AWS_ACCESS_KEY_ID=minioadmin \
@@ -113,7 +113,7 @@ pipeline {
 
                     sleep 10
 
-                    curl -f http://localhost:8080/health
+                    curl -f http://localhost:8083/health
 
                     podman stop ml-serving-test-${BUILD_NUMBER}
                     podman rm ml-serving-test-${BUILD_NUMBER}
