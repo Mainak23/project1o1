@@ -10,117 +10,133 @@ pipeline {
 
     stages {
 
-        
-
+        // --------------------------------------------------
+        // 1. Checkout source code
+        // --------------------------------------------------
         stage('Checkout') {
             steps {
                 checkout scm
 
                 sh '''
-                    echo "===== WORKSPACE new ====="
+                    echo "===== WORKSPACE ====="
                     pwd
-                    
-                    echo "training files:"
-                    
-                    find . -maxdepth 2 -type f | sort
+
+                    echo "===== FILES ====="
+                    find . -maxdepth 3 -type f | sort
 
                     echo "===== GIT INFORMATION ====="
                     echo "GIT_COMMIT=${GIT_COMMIT}"
                     git rev-parse HEAD
-                    
-                '''
-            }
-        }
-        stage('Prepare Directories') {
-            steps {
-                sh '''
-                    rm -rf deployment regigster
-
-                    
-                    mkdir -p regigster
-                    mkdir -p deployment
-
-                    echo "Directory structure:"
-                    find . -maxdepth 2 -type d | sort
                 '''
             }
         }
 
-        stage('Build ML Register Image') {
-            steps {
-                
-                sh '''
-                    podman build \
-                    -t ml-training:${BUILD_NUMBER} \
-                    ./regigster
-                '''
-                }
-           
-        }
 
-        // stage('Trivy Scan') {
-        //     steps {
-        //         sh '''
-        //          rm -f ml-training.tar
-
-        //     podman save \
-        //         --format docker-archive \
-        //         -o ml-training.tar \
-        //         "localhost/ml-training:${BUILD_NUMBER}"
-
-        //     podman run --rm \
-        //         -v "$PWD/ml-training.tar:/scan/ml-training.tar:ro" \
-        //         -v trivy-cache:/root/.cache/trivy \
-        //         docker.io/aquasec/trivy:0.72.0 \
-        //         image \
-        //         --input /scan/ml-training.tar \
-        //         --severity HIGH,CRITICAL \
-        //         --format table
-               
-        // '''
-                
-        //     }
-        // }
-
-        stage('Register model') {
+        // --------------------------------------------------
+        // 2. Verify project structure
+        // --------------------------------------------------
+        stage('Verify Project') {
             steps {
                 sh '''
-                    podman run --rm \
-                --network ml-network \
-                -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
-                -e MLFLOW_S3_ENDPOINT_URL=http://minio:9000\
-                -e AWS_ACCESS_KEY_ID=minioadmin \
-                -e AWS_SECRET_ACCESS_KEY=minioadmin123 \
-                -e GIT_COMMIT="${GIT_COMMIT}"\
-                ml-training:${BUILD_NUMBER}
+                    echo "===== Training / Registration ====="
+                    ls -lah regigster
+
+                    echo "===== Deployment / Serving ====="
+                    ls -lah deployment
                 '''
             }
         }
 
-        stage('Build and push serving image') {
+
+        // --------------------------------------------------
+        // 3. Build training image
+        // --------------------------------------------------
+        stage('Build ML Training Image') {
             steps {
                 sh '''
                     podman build \
-                    -t ml-serving:${BUILD_NUMBER} \
-                    ./deployment
-                '''
-            }
-        }
-        stage('Deploy model') {
-            steps {
-                sh '''
-                    podman run --rm \
-                --network ml-network \
-                -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
-                -e MLFLOW_S3_ENDPOINT_URL=http://minio:9000\
-                -e AWS_ACCESS_KEY_ID=minioadmin \
-                -e AWS_SECRET_ACCESS_KEY=minioadmin123 \
-                -e GIT_COMMIT="${GIT_COMMIT}"\
-                ml-serving:${BUILD_NUMBER}
+                        -t ml-training:${BUILD_NUMBER} \
+                        ./regigster
                 '''
             }
         }
 
+
+        // --------------------------------------------------
+        // 4. Register model in MLflow
+        // --------------------------------------------------
+        stage('Register Model') {
+            steps {
+                sh '''
+                    podman run --rm \
+                        --network ml-network \
+                        -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
+                        -e MLFLOW_S3_ENDPOINT_URL=http://minio:9000 \
+                        -e AWS_ACCESS_KEY_ID=minioadmin \
+                        -e AWS_SECRET_ACCESS_KEY=minioadmin123 \
+                        -e GIT_COMMIT="${GIT_COMMIT}" \
+                        ml-training:${BUILD_NUMBER}
+                '''
+            }
+        }
+
+
+        // --------------------------------------------------
+        // 5. Build serving image
+        // --------------------------------------------------
+        stage('Build ML Serving Image') {
+            steps {
+                sh '''
+                    podman build \
+                        -t ml-serving:${BUILD_NUMBER} \
+                        ./deployment
+                '''
+            }
+        }
+
+
+        // --------------------------------------------------
+        // 6. Test serving image locally
+        // --------------------------------------------------
+        stage('Test Serving Image') {
+            steps {
+                sh '''
+                    podman run -d \
+                        --name ml-serving-test-${BUILD_NUMBER} \
+                        --network ml-network \
+                        -p 8080:8080 \
+                        -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
+                        -e MLFLOW_S3_ENDPOINT_URL=http://minio:9000 \
+                        -e AWS_ACCESS_KEY_ID=minioadmin \
+                        -e AWS_SECRET_ACCESS_KEY=minioadmin123 \
+                        ml-serving:${BUILD_NUMBER}
+
+                    sleep 10
+
+                    curl -f http://localhost:8080/health
+
+                    podman stop ml-serving-test-${BUILD_NUMBER}
+                    podman rm ml-serving-test-${BUILD_NUMBER}
+                '''
+            }
+        }
+
+
+        // --------------------------------------------------
+        // 7. Show built images
+        // --------------------------------------------------
+        stage('Verify Images') {
+            steps {
+                sh '''
+                    podman images | grep -E 'ml-training|ml-serving'
+                '''
+            }
+        }
+
+
+        // --------------------------------------------------
+        // 8. Clean workspace
+        // --------------------------------------------------
         stage('Clean Workspace') {
             steps {
                 deleteDir()
