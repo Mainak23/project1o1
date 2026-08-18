@@ -12,11 +12,11 @@ ENV PATH="/op/venv/bin:$PATH"
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-COPY src/ ./src/
+COPY serv/ ./serv/
 
 RUN useradd --create-home --shell /bin/bash appuser \
     && chown -R appuser:appuser /ap
 
 USER appuser
 
-CMD ["python", "src/main.py"]
+CMD ["python", "serv/main.py"]
