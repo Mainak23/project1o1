@@ -32,12 +32,14 @@ pipeline {
 
         stage('Build ML Register Image') {
             steps {
-                sh '''
-                    podman build \
-                        -t ml-training:${BUILD_NUMBER} \
-                        .
                 '''
-            }
+                sh podman build \
+                -t ml-training:${BUILD_NUMBER} \
+                ./training
+
+                 '''
+                }
+           
         }
 
         // stage('Trivy Scan') {
@@ -75,6 +77,32 @@ pipeline {
                 -e AWS_SECRET_ACCESS_KEY=minioadmin123 \
                 -e GIT_COMMIT="${GIT_COMMIT}"\
                 ml-training:${BUILD_NUMBER}
+                '''
+            }
+        }
+
+        stage('Build and push serving image') {
+            steps {
+                sh '''
+                    podman build \
+                    -t ml-serving:${BUILD_NUMBER} \
+                    ./serving
+
+                   
+                '''
+            }
+        }
+        stage('Deploy model') {
+            steps {
+                sh '''
+                    podman run --rm \
+                --network ml-network \
+                -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
+                -e MLFLOW_S3_ENDPOINT_URL=http://minio:9000\
+                -e AWS_ACCESS_KEY_ID=minioadmin \
+                -e AWS_SECRET_ACCESS_KEY=minioadmin123 \
+                -e GIT_COMMIT="${GIT_COMMIT}"\
+                ml-serving:${BUILD_NUMBER}
                 '''
             }
         }
