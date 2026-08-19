@@ -89,7 +89,7 @@ pipeline {
                             passwordVariable: 'PASSWORD'
                         )
                     ])
-                    sh '''
+                { sh '''
                         podman build \
                             -t ghcr.io/mainak23/ml-serving:${BUILD_NUMBER} \
                             ./deployment
@@ -98,6 +98,7 @@ pipeline {
                             ghcr.io/mainak23/ml-serving:${BUILD_NUMBER}
                     '''
             }
+        }
         }
 
       
@@ -150,6 +151,7 @@ pipeline {
                             passwordVariable: 'PASSWORD'
                         )
                     ])
+                {
                     sh '''
 
                     printf "%s" "$PASSWORD" | podman login ghcr.io \
@@ -171,6 +173,7 @@ pipeline {
                     git push origin main
                 '''
             }
+        }
         }
         // --------------------------------------------------
         // 8. Clean workspace
