@@ -150,49 +150,53 @@ pipeline {
             }
         }
 
-        stage('Push Manifest') {
-            steps {
-                   withCredentials([
+        stage('Update Deployment Repo') {
+                steps {
+                    withCredentials([
                         usernamePassword(
-                            credentialsId: '98484553-4b67-41bb-b338-ca81a9d99213',
-                            usernameVariable: 'USER',
-                            passwordVariable: 'PASSWORD'
+                            credentialsId: 'github-credentials',
+                            usernameVariable: 'GIT_USER',
+                            passwordVariable: 'GIT_TOKEN'
                         )
-                    ])
-                {
-                    sh '''
-
-                    printf "%s" "$PASSWORD" | podman login ghcr.io \
-                            -u "$USER" \
-                            --password-stdin
-
-                set -e
-
-                cd /var/lib/jenkins/workspace/mlops101
+                    ]) {
+                        sh '''
+                            set -eu
             
-                cd deployment-repo
-                git pull --rebase origin main
-                cd ..
+                            echo "Workspace: $WORKSPACE"
             
-                cp model-deployment.yaml deployment-repo/model-deployment.yaml
+                            rm -rf "$WORKSPACE/deployment-repo"
             
-                cd deployment-repo
+                            git clone \
+                                "https://github.com/Mainak23/deployment.git" \
+                                "$WORKSPACE/deployment-repo"
             
-                git config user.name "Mainak23"
-                git config user.email "mainakray111@gmail.com"
+                            cp "$WORKSPACE/model-deployment.yaml" \
+                               "$WORKSPACE/deployment-repo/model-deployment.yaml"
             
-                git add model-deployment.yaml
+                            cd "$WORKSPACE/deployment-repo"
             
-                if git diff --cached --quiet; then
-                    echo "No changes to commit"
-                else
-                    git commit -m "Deploy ml-serving ${BUILD_NUMBER}"
-                    git push https://${PASSWORD}@github.com/Mainak23/deployment.git main
-                fi
-                            '''
-                        }
+                            git config user.name "Mainak23"
+                            git config user.email "mainakray111@gmail.com"
+            
+                            git add model-deployment.yaml
+            
+                            if git diff --cached --quiet; then
+                                echo "No deployment changes detected."
+                                exit 0
+                            fi
+            
+                            git commit \
+                                -m "Deploy ml-serving ${BUILD_NUMBER}"
+            
+                            git push \
+                                "https://${GIT_USER}:${GIT_TOKEN}@github.com/Mainak23/deployment.git" \
+                                HEAD:main
+            
+                            echo "Deployment manifest pushed successfully."
+                        '''
                     }
-                    }
+                }
+            }
         // --------------------------------------------------
         // 8. Clean workspace
         // --------------------------------------------------
