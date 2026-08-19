@@ -93,7 +93,10 @@ pipeline {
                         podman build \
                             -t ghcr.io/mainak23/ml-serving:${BUILD_NUMBER} \
                             ./deployment
-        
+
+
+                        podman login ghcr.io
+                        
                         podman push \
                             ghcr.io/mainak23/ml-serving:${BUILD_NUMBER}
                     '''
