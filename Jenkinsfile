@@ -143,7 +143,6 @@ pipeline {
 
         stage('Push Manifest') {
             steps {
-                withCredentials([
                    withCredentials([
                         usernamePassword(
                             credentialsId: 'github-123',
