@@ -90,6 +90,7 @@ pipeline {
                         )
                     ])
                 { sh '''
+                        set -e
                         podman build \
                             -t ghcr.io/mainak23/ml-serving:${BUILD_NUMBER} \
                             ./deployment
