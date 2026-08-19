@@ -169,13 +169,12 @@ pipeline {
                     git clone https://github.com/Mainak23/deployment.git deployment-repo
 
                     cd deployment-repo
-
-                    # Copy/update your manifest
-                    cp model-deployment.yaml deployment-repo/model-deployment.yaml
-
+                    
+                    cp ../model-deployment.yaml model-deployment.yaml
+                    
                     git config user.name "Mainak23"
                     git config user.email "mainakray111@gmail.com"
-
+                    
                     git add model-deployment.yaml
                     git commit -m "Deploy ml-serving ${BUILD_NUMBER}" || true
                     git push origin main
