@@ -84,7 +84,6 @@ pipeline {
 
         stage('Build and Push Serving Image') {
             steps {
-                 {
                     sh '''
                         podman build \
                             -t ghcr.io/mainak23/ml-serving:${BUILD_NUMBER} \
@@ -97,7 +96,6 @@ pipeline {
                         podman push \
                             ghcr.io/mainak23/ml-serving:${BUILD_NUMBER}
                     '''
-                }
             }
         }
 
