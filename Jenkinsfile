@@ -51,7 +51,7 @@ pipeline {
         // --------------------------------------------------
         // 3. Build training image
         // --------------------------------------------------
-        stage('Build ML Training Image') {
+        stage('Register Image') {
             steps {
                 sh '''
                     podman build \
