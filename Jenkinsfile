@@ -153,9 +153,9 @@ pipeline {
                     ])
                     sh '''
 
-                    // printf "%s" "$GHCR_TOKEN" | podman login ghcr.io \
-                    //         -u "$GHCR_USER" \
-                    //         --password-stdin
+                    printf "%s" "PASSWORD" | podman login ghcr.io \
+                            -u "USER" \
+                            --password-stdin
 
                     git clone https://github.com/Mainak23/deployment.git deployment-repo
 
