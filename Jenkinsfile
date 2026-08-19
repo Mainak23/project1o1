@@ -166,22 +166,33 @@ pipeline {
                             -u "$USER" \
                             --password-stdin
 
-                    git clone https://github.com/Mainak23/deployment.git deployment-repo
+                set -e
 
-                    cd deployment-repo
-                    
-                    cp ../model-deployment.yaml model-deployment.yaml
-                    
-                    git config user.name "Mainak23"
-                    git config user.email "mainakray111@gmail.com"
-                    
-                    git add model-deployment.yaml
-                    git commit -m "Deploy ml-serving ${BUILD_NUMBER}" || true
+                cd /var/lib/jenkins/workspace/mlops101
+            
+                cd deployment-repo
+                git pull --rebase origin main
+                cd ..
+            
+                cp model-deployment.yaml deployment-repo/model-deployment.yaml
+            
+                cd deployment-repo
+            
+                git config user.name "Mainak23"
+                git config user.email "mainakray111@gmail.com"
+            
+                git add model-deployment.yaml
+            
+                if git diff --cached --quiet; then
+                    echo "No changes to commit"
+                else
+                    git commit -m "Deploy ml-serving ${BUILD_NUMBER}"
                     git push origin main
-                '''
-            }
-        }
-        }
+                fi
+                            '''
+                        }
+                    }
+                    }
         // --------------------------------------------------
         // 8. Clean workspace
         // --------------------------------------------------
