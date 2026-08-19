@@ -6,8 +6,6 @@ pipeline {
         GIT_PYTHON_REFRESH = 'quiet'
         XDG_RUNTIME_DIR = '/run/user/111'
         PATH = "/var/lib/jenkins/bin:${env.PATH}"
-        GHCR_TOKEN="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"
-        GHCR_USER="Mainak23"
     }
 
     stages {
@@ -84,6 +82,13 @@ pipeline {
 
         stage('Build and Push Serving Image') {
             steps {
+                withCredentials([
+                        usernamePassword(
+                            credentialsId: 'github-123',
+                            usernameVariable: 'USER',
+                            passwordVariable: 'PASSWORD'
+                        )
+                    ])
                     sh '''
                         podman build \
                             -t ghcr.io/mainak23/ml-serving:${BUILD_NUMBER} \
@@ -139,17 +144,18 @@ pipeline {
         stage('Push Manifest') {
             steps {
                 withCredentials([
-                    usernamePassword(
-                        credentialsId: 'github-credentials',
-                        usernameVariable: $GHCR_USER,
-                        passwordVariable: $GHCR_TOKEN
-                    )
-                ])
-                sh '''
+                   withCredentials([
+                        usernamePassword(
+                            credentialsId: 'github-123',
+                            usernameVariable: 'USER',
+                            passwordVariable: 'PASSWORD'
+                        )
+                    ])
+                    sh '''
 
-                    printf "%s" "$GHCR_TOKEN" | podman login ghcr.io \
-                            -u "$GHCR_USER" \
-                            --password-stdin
+                    // printf "%s" "$GHCR_TOKEN" | podman login ghcr.io \
+                    //         -u "$GHCR_USER" \
+                    //         --password-stdin
 
                     git clone https://github.com/Mainak23/deployment.git deployment-repo
 
