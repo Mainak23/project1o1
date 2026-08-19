@@ -1,5 +1,5 @@
 containers:
-  - name: ml-serving
+  - name: ml-serving2
     image: ml-serving:1
 
     ports:
