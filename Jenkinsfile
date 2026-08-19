@@ -39,7 +39,7 @@ pipeline {
             steps {
                 sh '''
                     echo "===== Training / Registration ====="
-                    ls -lah regigster
+                    ls -lah register
 
                     echo "===== Deployment / Serving ====="
                     ls -lah deployment
@@ -56,7 +56,7 @@ pipeline {
                 sh '''
                     podman build \
                         -t ml-training:${BUILD_NUMBER} \
-                        ./regigster
+                        ./register
                 '''
             }
         }
