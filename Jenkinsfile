@@ -84,13 +84,7 @@ pipeline {
 
         stage('Build and Push Serving Image') {
             steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'github-credentials',
-                        usernameVariable: 'GITHUB_USER',
-                        passwordVariable: 'GITHUB_TOKEN'
-                    )
-                ]) {
+                 {
                     sh '''
                         podman build \
                             -t ghcr.io/mainak23/ml-serving:${BUILD_NUMBER} \
@@ -150,6 +144,13 @@ pipeline {
 
         stage('Push Manifest') {
             steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'github-credentials',
+                        usernameVariable: 'GITHUB_USER',
+                        passwordVariable: 'GITHUB_TOKEN'
+                    )
+                ])
                 sh '''
 
                     git clone https://github.com/Mainak23/deployment.git deployment-repo
