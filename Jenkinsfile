@@ -88,11 +88,16 @@ pipeline {
             steps {
                 sh '''
                     podman build \
-                        -t ml-serving:${BUILD_NUMBER} \
-                        ./deployment
+            -t ghcr.io/mainak23/ml-serving:${BUILD_NUMBER} \
+            ./deployment
+
+            podman push \
+            ghcr.io/mainak23/ml-serving:${BUILD_NUMBER}
                 '''
             }
         }
+
+      
 
 
         // --------------------------------------------------
