@@ -82,28 +82,28 @@ pipeline {
             }
         }
 
-        stage("loging into ghcr.io") {
+        stage('Build and Push Serving Image') {
             steps {
-                sh '''
-                    echo "$GHCR_TOKEN" | podman login ghcr.io \
-                    -u "$GHCR_USER" \
-                    --password-stdin
-                '''
-            }
-        }
-        // --------------------------------------------------
-        // 5. Build serving image
-        // --------------------------------------------------
-        stage('Build ML Serving Image') {
-            steps {
-                sh '''
-                podman build \
-            -t ghcr.io/mainak23/ml-serving:${BUILD_NUMBER} \
-            ./deployment
-
-            podman push \
-            ghcr.io/mainak23/ml-serving:${BUILD_NUMBER}
-                '''
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'github-credentials',
+                        usernameVariable: 'GITHUB_USER',
+                        passwordVariable: 'GITHUB_TOKEN'
+                    )
+                ]) {
+                    sh '''
+                        podman build \
+                            -t ghcr.io/mainak23/ml-serving:${BUILD_NUMBER} \
+                            ./deployment
+        
+                        printf "%s" "$GITHUB_TOKEN" | podman login ghcr.io \
+                            -u "$GITHUB_USER" \
+                            --password-stdin
+        
+                        podman push \
+                            ghcr.io/mainak23/ml-serving:${BUILD_NUMBER}
+                    '''
+                }
             }
         }
 
