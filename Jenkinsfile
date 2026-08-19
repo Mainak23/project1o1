@@ -95,10 +95,9 @@ pipeline {
                             -t ghcr.io/mainak23/ml-serving:${BUILD_NUMBER} \
                             ./deployment
 
-
-                        echo "$GHCR_TOKEN" | podman login ghcr.io \
-                        --username "$GHCR_USERNAME" \
-                        --password-stdin
+                     echo "$PASSWORD" | podman login ghcr.io \
+                                --username "$USER" \
+                                --password-stdin
                         
                         podman push \
                             ghcr.io/mainak23/ml-serving:${BUILD_NUMBER}
