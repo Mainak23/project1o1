@@ -89,10 +89,6 @@ pipeline {
                             -t ghcr.io/mainak23/ml-serving:${BUILD_NUMBER} \
                             ./deployment
         
-                        printf "%s" "$GITHUB_TOKEN" | podman login ghcr.io \
-                            -u "$GITHUB_USER" \
-                            --password-stdin
-        
                         podman push \
                             ghcr.io/mainak23/ml-serving:${BUILD_NUMBER}
                     '''
@@ -145,11 +141,15 @@ pipeline {
                 withCredentials([
                     usernamePassword(
                         credentialsId: 'github-credentials',
-                        usernameVariable: 'GITHUB_USER',
-                        passwordVariable: 'GITHUB_TOKEN'
+                        usernameVariable: $GHCR_USER,
+                        passwordVariable: $GHCR_TOKEN
                     )
                 ])
                 sh '''
+
+                    printf "%s" "$GHCR_TOKEN" | podman login ghcr.io \
+                            -u "$GHCR_USER" \
+                            --password-stdin
 
                     git clone https://github.com/Mainak23/deployment.git deployment-repo
 
