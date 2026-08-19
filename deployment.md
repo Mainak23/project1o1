@@ -415,3 +415,25 @@ ghcr.io/mainak23/ml-serving:19
 │       │       └───────────── image name
 │       └───────────────────── GitHub owner
 └───────────────────────────── registry
+
+ls -lah /var/lib/jenkins/workspace/mlops101
+
+mlops101
+│
+├── model-deployment.yaml
+│
+│       cp
+│       ↓
+│
+└── deployment-repo
+        │
+        └── model-deployment.yaml
+                │
+                ↓
+             git add
+                ↓
+             git commit
+                ↓
+             git push
+                ↓
+     github.com/Mainak23/deployment
