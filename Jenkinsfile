@@ -84,7 +84,7 @@ pipeline {
             steps {
                 withCredentials([
                         usernamePassword(
-                            credentialsId: 'github-123',
+                            credentialsId: '98484553-4b67-41bb-b338-ca81a9d99213',
                             usernameVariable: 'USER',
                             passwordVariable: 'PASSWORD'
                         )
@@ -146,7 +146,7 @@ pipeline {
             steps {
                    withCredentials([
                         usernamePassword(
-                            credentialsId: 'github-123',
+                            credentialsId: '98484553-4b67-41bb-b338-ca81a9d99213',
                             usernameVariable: 'USER',
                             passwordVariable: 'PASSWORD'
                         )
