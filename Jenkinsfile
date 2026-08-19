@@ -187,7 +187,7 @@ pipeline {
                     echo "No changes to commit"
                 else
                     git commit -m "Deploy ml-serving ${BUILD_NUMBER}"
-                    git push origin main
+                    git push https://${PASSWORD}@github.com/Mainak23/deployment.git main
                 fi
                             '''
                         }
