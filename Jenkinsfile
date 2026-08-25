@@ -47,6 +47,30 @@ pipeline {
             }
         }
 
+        stage('Build ML Training Image') {
+            steps {
+                sh '''
+                    podman build \
+                        -t ml-training:${BUILD_NUMBER} \
+                        ./Training
+                '''
+            }
+        }  
+
+        stage('Train') {
+            steps {
+                sh '''
+                    podman run --rm \
+                --network ml-network \
+                -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
+                -e MLFLOW_S3_ENDPOINT_URL=http://minio:9000 \
+                -e AWS_ACCESS_KEY_ID=minioadmin \
+                -e AWS_SECRET_ACCESS_KEY=minioadmin123 \
+                -e GIT_COMMIT="${GIT_COMMIT}"\
+                ml-training:${BUILD_NUMBER}
+                '''
+            }
+        }
 
         // --------------------------------------------------
         // 3. Build training image
@@ -75,7 +99,7 @@ pipeline {
                         -e AWS_ACCESS_KEY_ID=minioadmin \
                         -e AWS_SECRET_ACCESS_KEY=minioadmin123 \
                         -e GIT_COMMIT="${GIT_COMMIT}" \
-                        ml-training:${BUILD_NUMBER}
+                        ml-register:${BUILD_NUMBER}
                 '''
             }
         }
@@ -126,7 +150,7 @@ pipeline {
                         -e MLFLOW_S3_ENDPOINT_URL=http://minio:9000 \
                         -e AWS_ACCESS_KEY_ID=minioadmin \
                         -e AWS_SECRET_ACCESS_KEY=minioadmin123 \
-                        ml-serving:${BUILD_NUMBER}
+                        ml-register:${BUILD_NUMBER}
 
                     sleep 10
 
