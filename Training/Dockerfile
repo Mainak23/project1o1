@@ -3,7 +3,7 @@ FROM python:3.13-slim
 WORKDIR /ap
 
 COPY requirements.txt .
-COPY app.py .
+COPY main.py .
 
 
 RUN python -m venv /op/venv
@@ -19,4 +19,4 @@ RUN useradd --create-home --shell /bin/bash appuser \
 
 USER appuser
 
-CMD ["python", "app.py"]
+CMD ["python", "main.py"]
