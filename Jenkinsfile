@@ -79,7 +79,7 @@ pipeline {
             steps {
                 sh '''
                     podman build \
-                        -t ml-training:${BUILD_NUMBER} \
+                        -t ml-register:${BUILD_NUMBER} \
                         ./register
                 '''
             }
