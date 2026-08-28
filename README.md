@@ -38,6 +38,7 @@ This repository defines the multi-tier architecture patterns for scaling Machine
 </p>
 
 
+
 ---
 
 ## 1. Proof-of-Concept (POC) Architecture
