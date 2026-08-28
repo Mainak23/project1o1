@@ -29,10 +29,15 @@ The architecture diagram analyzed contrasts two operational tiers:
 
 This repository defines the multi-tier architecture patterns for scaling Machine Learning workloads from a Single-Node Proof-of-Concept (POC) to a fully automated, resilient Production environment.
 
+<p align="center">
+  <img src="images/architecture.png" width="900">
+</p>
 
-<a href="https://github.com/Mainak23/project1o1.gitmain/images/architecture.png" target="_blank">
-    <img src="assets/ml-platform-architecture.png" alt="ML Platform Multi-Tier Architecture" width="800">
-</a>
+<p align="center">
+  <b>Production ML Serving Architecture</b>
+</p>
+
+
 ---
 
 ## 1. Proof-of-Concept (POC) Architecture
