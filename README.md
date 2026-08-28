@@ -34,3 +34,28 @@ graph TD
 
     E -.->|Processed Data| I
     N --> O[MLflow Tracking]
+
+
+
+graph TD
+    subgraph Production Data & CI
+        A[Source Systems] -->|Kafka| B[Staging DB]
+        B --> C[Data Processing]
+        C --> D[(S3 / Data Lake)]
+        
+        E[Code Commit] --> F[Build & Test]
+        F --> G[Quality Gates: Trivy/SonarQube]
+        G --> H[Model Training]
+        H --> I[Container Registry]
+    end
+
+    subgraph GitOps & Scalable Serving
+        I -->|Argo CD Sync| J[K8s Multi-Node Cluster]
+        J --> K[API Gateway / Ingress]
+        K --> L[HPA / Autoscaler]
+        L --> M[ml-serving Pod 1..n]
+    end
+
+    D -.->|Delta/Parquet| H
+    M --> N[MLflow Tracking]
+    M --> O[Prometheus & Grafana]
