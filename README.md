@@ -25,27 +25,7 @@ The architecture diagram analyzed contrasts two operational tiers:
 | **Model Serving** | Static single pod deployment (`ml-serving`) | Horizontal Pod Autoscaler (HPA) with multi-pod load balancing |
 | **Observability** | Basic MLflow tracking (Logs & Metrics) | MLflow + Prometheus & Grafana for advanced monitoring and alerting |
 
----
 
-# Repository README.md
-
-```markdown
-# Enterprise ML Platform Architecture
-
-This repository defines the multi-tier architecture patterns for scaling Machine Learning workloads from a Single-Node Proof-of-Concept (POC) to a fully automated, resilient Production environment.
-
-## Table of Contents
-- [Overview](#overview)
-- [Unified Master Architecture & Data Flow Script](#unified-master-architecture--data-flow-script)
-- [Infrastructure & Services Matrix](#infrastructure--services-matrix)
-
----
-
-## Overview
-
-Deploying machine learning models successfully requires clear separation between experimental phases and production delivery. This codebase outlines standardized pipelines across data ingestion, processing, CI/CD validation, artifact registries, and scalable Kubernetes-based serving.
-
----
 
 
 
