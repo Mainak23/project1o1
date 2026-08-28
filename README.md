@@ -49,12 +49,11 @@ Deploying machine learning models successfully requires clear separation between
 
 ## Unified Master Architecture & Data Flow Script
 
-```mermaid
 graph TD
     %% ==========================================
     %% SECTION 1: PROOF-OF-CONCEPT (POC) TIER
     %% ==========================================
-    subgraph TIER_1 [Proof-of-Concept Tier Single-Node AKS]
+    subgraph TIER_1 [Proof-of-Concept Tier: Single-Node AKS]
         subgraph POC_Data [POC Data & CI]
             A1[Source Systems] -->|Ingestion| B1[Kafka / Staging DB]
             B1 --> C1[Data Processing]
@@ -73,16 +72,9 @@ graph TD
     end
 
     %% ==========================================
-    %% VISUAL DIVIDER 1
-    %% ==========================================
-    classDef dividerStyle fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#fff,font-weight:bold;
-    DIVIDER_1[================== PRODUCTION SYSTEM TRANSITION ==================]:::dividerStyle
-    TIER_1 === DIVIDER_1
-
-    %% ==========================================
     %% SECTION 2: PRODUCTION TIER
     %% ==========================================
-    subgraph TIER_2 [Production Tier Multi-Node AKS + Argo CD]
+    subgraph TIER_2 [Production Tier: Multi-Node AKS + Argo CD]
         subgraph PROD_Data [Production Data & CI with Quality Gates]
             A2[Source Systems] -->|Kafka| B2[Staging DB]
             B2 --> C2[Data Processing]
@@ -104,13 +96,7 @@ graph TD
     end
 
     %% ==========================================
-    %% VISUAL DIVIDER 2
-    %% ==========================================
-    DIVIDER_2[================== INFERENCE DATA FLOWS ==================]:::dividerStyle
-    TIER_2 === DIVIDER_2
-
-    %% ==========================================
-    %% SECTION 3: INFERENCE DATA FLOWS (POC VS PRODUCTION)
+    %% SECTION 3: INFERENCE DATA FLOWS
     %% ==========================================
     subgraph INFERENCE_FLOWS [Inference Traffic & Response Routing]
         subgraph POC_Inference [POC Inference Flow]
@@ -119,5 +105,7 @@ graph TD
         
         subgraph PROD_Inference [Production Scalable Inference Flow]
             FX2[External Request] --> FY2[API Gateway / Ingress] --> FZ2[Internal Load Balancer] --> FA2[ml-serving Autoscaled Pods] --> FB2[MLflow Model] --> FC2((Response))
+        end
+    end
         end
     end
