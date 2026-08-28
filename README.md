@@ -1,6 +1,6 @@
 # ML Platform: Multi-Tier Architecture Analysis & Repository Guide
 
-This document provides a comprehensive analysis of the transition from a **Proof-of-Concept (POC)** Machine Learning platform to a resilient, enterprise-grade **Production Architecture**. It includes detailed workflow breakdowns and production-ready `README.md` documentation featuring a fully unified Mermaid script combining all architecture and data flows with distinct visual dividers.
+This document provides a comprehensive analysis of the transition from a **Proof-of-Concept (POC)** Machine Learning platform to a resilient, enterprise-grade **Production Architecture**. It includes detailed workflow breakdowns and a production-ready `README.md` containing a fully unified Mermaid diagram script.
 
 ---
 
@@ -45,14 +45,9 @@ This repository defines the multi-tier architecture patterns for scaling Machine
 
 Deploying machine learning models successfully requires clear separation between experimental phases and production delivery. This codebase outlines standardized pipelines across data ingestion, processing, CI/CD validation, artifact registries, and scalable Kubernetes-based serving.
 
-
+---
 
 ## Unified Master Architecture & Data Flow Script
-
-
-
-
-
 
 ```mermaid
 graph TD
