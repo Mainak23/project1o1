@@ -29,7 +29,7 @@ The architecture diagram analyzed contrasts two operational tiers:
 
 This repository defines the multi-tier architecture patterns for scaling Machine Learning workloads from a Single-Node Proof-of-Concept (POC) to a fully automated, resilient Production environment.
 
-![Architecture Diagram](images/architecture.png)
+![Alt Text for Image](images/architecture.png)
 ---
 
 ## 1. Proof-of-Concept (POC) Architecture
