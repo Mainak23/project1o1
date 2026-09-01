@@ -142,24 +142,38 @@ pipeline {
         stage('Test Serving Image') {
             steps {
                 sh '''
+                    set -e
+        
+                    CONTAINER_NAME="ml-serving-test-${BUILD_NUMBER}"
+        
                     podman run -d \
-                        --name ml-serving-test-${BUILD_NUMBER} \
+                        --name ${CONTAINER_NAME} \
                         --network ml-network \
                         -p 8083:8080 \
                         -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
                         -e MLFLOW_S3_ENDPOINT_URL=http://minio:9000 \
                         -e AWS_ACCESS_KEY_ID=minioadmin \
                         -e AWS_SECRET_ACCESS_KEY=minioadmin123 \
-                        ml-register:${BUILD_NUMBER}
-
-                    sleep 10
-
-                    curl -f http://localhost:8083/health
-
-                    podman stop ml-serving-test-${BUILD_NUMBER}
-                    podman rm ml-serving-test-${BUILD_NUMBER}
+                        ml-serving:${BUILD_NUMBER}
+        
+                    echo "Waiting for ML serving API..."
+        
+                    for i in $(seq 1 30); do
+                        if curl -fs http://localhost:8083/health; then
+                            echo "ML serving is healthy!"
+                            break
+                        fi
+        
+                        echo "Attempt $i/30 failed. Waiting..."
+                        sleep 2
+                    done
+        
+                    curl -fs http://localhost:8083/health
+        
+                    podman stop ${CONTAINER_NAME}
+                    podman rm ${CONTAINER_NAME}
                 '''
-            }
+                    }
         }
 
 
