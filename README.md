@@ -45,28 +45,73 @@ This repository defines the multi-tier architecture patterns for scaling Machine
 
 The POC setup is optimized for rapid experimentation, validation, and single-node deployment using lightweight components.
 
-```mermaid
 graph TD
-    subgraph Data Pipeline
-        A[Source Systems] -->|Ingestion| B[Kafka]
-        B --> C[Staging DB / Raw Zone]
-        C --> D[Data Processing / Cleaning]
-        D --> E[(S3 / MinIO)]
+
+    %% =========================
+    %% DATA PIPELINE
+    %% =========================
+    subgraph DP["Data / ML Pipeline"]
+
+        A["Source Systems"]
+        B["Kafka"]
+        C["Staging DB / Raw Zone"]
+        D["Airflow"]
+        E["Data Processing / Cleaning"]
+        F["Data Validation"]
+        G[("S3 / MinIO")]
+
+        A -->|Ingestion| B
+        B --> C
+        C --> D
+        D --> E
+        E --> F
+        F --> G
+
+        H["Model Training"]
+        I["MLflow Tracking"]
+        J["Model Evaluation"]
+        K["Model Registry"]
+
+        G --> H
+        H --> I
+        I --> J
+        J --> K
     end
 
-    subgraph CI Pipeline - Jenkins
-        F[Code Commit] --> G[Build & Unit Test]
-        G --> H[Data Validation]
-        H --> I[Model Training & Eval]
-        I --> J[Compare & Commit]
+    %% =========================
+    %% CI/CD
+    %% =========================
+    subgraph CICD["CI/CD Pipeline"]
+
+        L["Developer"]
+        M["Git"]
+        N["Jenkins"]
+        O["Test / Security Scan"]
+        P["Build Container"]
+        Q["GHCR"]
+
+        L -->|Commit| M
+        M --> N
+        N --> O
+        O --> P
+        P --> Q
     end
 
-    subgraph Deployment - Single Node AKS
-        J --> K[Container Registry]
-        K --> L[Kubectl Apply]
-        L --> M[Traefik Ingress]
-        M --> N[ml-serving Pod]
+    %% =========================
+    %% MODEL DEPLOYMENT
+    %% =========================
+    subgraph SERVING["Model Serving"]
+
+        R["K3s / Kubernetes"]
+        S["FastAPI ML Serving"]
+        T["Model Inference"]
+
+        Q -->|Deploy Image| R
+        R --> S
+        S --> T
     end
 
-    E -.->|Processed Data| I
-    N --> O[MLflow Tracking]
+    %% =========================
+    %% MODEL PROMOTION
+    %% =========================
+    K -->|Promoted Model| N
