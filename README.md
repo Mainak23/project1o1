@@ -116,3 +116,206 @@ graph TD
     %% =========================
     K -->|Promoted Model| N
 ```
+
+
+
+
+# 🚀 How to Run the ML Serving Project
+
+Follow these steps to run the complete ML serving project locally with Kubernetes/K3s.
+
+## 1. Clone the Repository
+
+```bash
+git clone <YOUR_REPOSITORY_URL>
+cd <PROJECT_DIRECTORY>
+```
+
+## 2. Start Required Services
+
+Make sure the required services are running:
+
+* K3s / Kubernetes
+* MLflow
+* MinIO, if required by the model setup
+* Jenkins
+* git and GHCR need to be configure
+
+Check K3s:
+
+```bash
+sudo systemctl status k3s
+```
+
+Check the cluster:
+
+```bash
+kubectl get nodes
+```
+
+Expected:
+
+```text
+STATUS: Ready
+```
+
+---
+
+
+## 5. Create the Kubernetes Namespace
+
+```bash
+kubectl create namespace ml-serving
+```
+
+If it already exists:
+
+```bash
+kubectl get namespace ml-serving
+```
+
+---
+
+## 6. Configure GHCR Authentication
+
+Create the registry secret:
+
+```bash
+kubectl create secret docker-registry ghcr-secret \
+  --docker-server=ghcr.io \
+  --docker-username=<GITHUB_USERNAME> \
+  --docker-password='<GITHUB_TOKEN>' \
+  -n ml-serving
+```
+
+Verify:
+
+```bash
+kubectl get secret -n ml-serving
+```
+
+---
+
+## 7. Deploy the Application
+
+First validate the Kubernetes YAML:
+
+```bash
+kubectl apply --dry-run=client -f model-deployment.yaml
+```
+
+Deploy:
+
+```bash
+kubectl apply -f model-deployment.yaml (chnage venv and image: ghcr.io/mainak23/ml-serving:version)
+```
+
+---
+
+## 8. Check the Deployment
+
+```bash
+kubectl get deployment -n ml-serving
+```
+
+```bash
+kubectl get pods -n ml-serving
+```
+
+The expected state is:
+
+```text
+1/1 Running
+```
+
+Check rollout:
+
+```bash
+kubectl rollout status deployment/ml-serving2 -n ml-serving
+```
+
+---
+
+## 9. Check Application Logs
+
+```bash
+kubectl logs deployment/ml-serving2 \
+  -n ml-serving \
+  --tail=100
+```
+
+For live logs:
+
+```bash
+kubectl logs deployment/ml-serving2 \
+  -n ml-serving \
+  -f
+```
+
+---
+
+## 10. Port Forward the API
+
+Forward the Kubernetes service to your local machine:
+
+```bash
+kubectl port-forward svc/ml-serving2 8081:8080 -n ml-serving
+```
+
+Keep this terminal running.
+
+---
+
+## 11. Test the Health Endpoint
+
+Open another terminal:
+
+```bash
+curl http://127.0.0.1:8081/health
+```
+
+Expected:
+
+```json
+{"status":"healthy"}
+```
+
+---
+
+## 12. Test the Prediction API
+
+Send 30 breast-cancer features:
+
+```bash
+curl -X POST http://127.0.0.1:8081/predict \
+-H "Content-Type: application/json" \
+-d '{
+  "data": [[17.99,10.38,122.8,1001.0,0.1184,0.2776,0.3001,0.1471,0.2419,0.07871,1.095,0.9053,8.589,153.4,0.006399,0.04904,0.05373,0.01587,0.03003,0.006193,25.38,17.33,184.6,2019.0,0.1622,0.6656,0.7119,0.2654,0.4601,0.1189]]
+}'
+```
+
+Expected:
+
+```json
+{"prediction":[0]}
+```
+
+---
+
+# ✅ Final Verification Checklist
+
+* [ ] Repository cloned
+* [ ] K3s running
+* [ ] Kubernetes node is `Ready`
+* [ ] MLflow is accessible
+* [ ] Container image built
+* [ ] Image pushed to GHCR
+* [ ] GHCR secret created
+* [ ] Kubernetes YAML validated
+* [ ] Deployment created
+* [ ] Pod is `1/1 Running`
+* [ ] Application logs checked
+* [ ] Port forwarding enabled
+* [ ] `/health` returns `healthy`
+* [ ] `/predict` returns a prediction
+
