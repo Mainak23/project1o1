@@ -44,7 +44,7 @@ This repository defines the multi-tier architecture patterns for scaling Machine
 ## 1. Proof-of-Concept (POC) Architecture
 
 The POC setup is optimized for rapid experimentation, validation, and single-node deployment using lightweight components.
-
+```mermaid
 graph TD
 
     %% =========================
@@ -115,3 +115,4 @@ graph TD
     %% MODEL PROMOTION
     %% =========================
     K -->|Promoted Model| N
+```
