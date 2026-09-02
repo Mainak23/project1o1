@@ -1,6 +1,6 @@
 import os
 import logging
-
+import numpy as np
 import mlflow
 from mlflow.tracking import MlflowClient
 from fastapi import FastAPI, HTTPException
@@ -141,26 +141,34 @@ def model_info():
 def predict(request: dict):
 
     try:
-
-        input_data = request["data"]
-
-        prediction = model.predict(
-            input_data
+        # JSON list -> NumPy array
+        input_data = np.asarray(
+            request["data"],
+            dtype=np.float64
         )
+
+        # Model expects (N, 30)
+        if input_data.ndim != 2:
+            raise ValueError(
+                f"Expected 2D input (N, 30), got shape {input_data.shape}"
+            )
+
+        if input_data.shape[1] != 30:
+            raise ValueError(
+                f"Expected 30 features, got {input_data.shape[1]}"
+            )
+
+        prediction = model.predict(input_data)
 
         return {
             "prediction": prediction.tolist()
-            if hasattr(prediction, "tolist")
-            else prediction
         }
 
     except Exception as exc:
 
-        logger.exception(
-            "Prediction failed"
-        )
+        logger.exception("Prediction failed")
 
         raise HTTPException(
             status_code=500,
-            detail="Prediction failed"
+            detail=str(exc)
         ) from exc
