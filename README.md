@@ -162,7 +162,7 @@ STATUS: Ready
 ---
 
 
-## 5. Create the Kubernetes Namespace
+## 3. Create the Kubernetes Namespace
 
 ```bash
 kubectl create namespace ml-serving
@@ -176,7 +176,7 @@ kubectl get namespace ml-serving
 
 ---
 
-## 6. Configure GHCR Authentication
+## 4. Configure GHCR Authentication
 
 Create the registry secret:
 
@@ -196,7 +196,7 @@ kubectl get secret -n ml-serving
 
 ---
 
-## 7. Deploy the Application
+## 5. Deploy the Application
 
 First validate the Kubernetes YAML:
 
@@ -212,7 +212,7 @@ kubectl apply -f model-deployment.yaml (chnage venv and image: ghcr.io/mainak23/
 
 ---
 
-## 8. Check the Deployment
+## 6. Check the Deployment
 
 ```bash
 kubectl get deployment -n ml-serving
@@ -236,7 +236,7 @@ kubectl rollout status deployment/ml-serving2 -n ml-serving
 
 ---
 
-## 9. Check Application Logs
+## 7. Check Application Logs
 
 ```bash
 kubectl logs deployment/ml-serving2 \
@@ -254,7 +254,7 @@ kubectl logs deployment/ml-serving2 \
 
 ---
 
-## 10. Port Forward the API
+## 8. Port Forward the API
 
 Forward the Kubernetes service to your local machine:
 
@@ -266,7 +266,7 @@ Keep this terminal running.
 
 ---
 
-## 11. Test the Health Endpoint
+## 9. Test the Health Endpoint
 
 Open another terminal:
 
@@ -282,7 +282,7 @@ Expected:
 
 ---
 
-## 12. Test the Prediction API
+## 10. Test the Prediction API
 
 Send 30 breast-cancer features:
 
