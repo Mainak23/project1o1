@@ -127,8 +127,8 @@ Follow these steps to run the complete ML serving project locally with Kubernete
 ## 1. Clone the Repository
 
 ```bash
-git clone <YOUR_REPOSITORY_URL>
-cd <PROJECT_DIRECTORY>
+git clone https://github.com/Mainak23/project1o1.git
+cd main
 ```
 
 ## 2. Start Required Services
