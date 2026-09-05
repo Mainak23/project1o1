@@ -104,7 +104,7 @@ pipeline {
             }
         }
 
-        stage('Build and Push Serving Image') {
+        stage('Build and Push deployment Image') {
             steps {
                 withCredentials([
                         usernamePassword(
