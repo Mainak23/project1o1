@@ -73,7 +73,7 @@ pipeline {
         }
 
         // --------------------------------------------------
-        // 3. Build training image
+        // 3. Build Register image
         // --------------------------------------------------
         stage('Register Image') {
             steps {
